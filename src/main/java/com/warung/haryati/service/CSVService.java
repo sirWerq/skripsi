@@ -65,11 +65,25 @@ public class CSVService {
             Transaksi t = new Transaksi();
             t.setId(entry.getKey()); // Menggunakan ID dari CSV
             try {
-                t.setTanggal(Date.valueOf(tanggalStr.trim()));
+                String cleanTgl = tanggalStr.trim();
+                // Deteksi format DD/MM/YYYY (Indonesian format)
+                if (cleanTgl.contains("/")) {
+                    String[] parts = cleanTgl.split("/");
+                    if (parts.length == 3) {
+                        // Jika tahun ada di depan (YYYY/MM/DD), biarkan. Jika di belakang, balik.
+                        if (parts[2].length() == 4) {
+                            cleanTgl = parts[2] + "-" + parts[1] + "-" + parts[0];
+                        } else if (parts[0].length() == 4) {
+                            cleanTgl = parts[0] + "-" + parts[1] + "-" + parts[2];
+                        }
+                    }
+                }
+                t.setTanggal(Date.valueOf(cleanTgl));
             } catch (IllegalArgumentException e) {
-                System.err.println("Gagal parsing tanggal: [" + tanggalStr + "]. Pastikan formatnya YYYY-MM-DD.");
+                System.err.println("Gagal parsing tanggal: [" + tanggalStr + "]. Gunakan format YYYY-MM-DD atau DD/MM/YYYY.");
                 throw new IOException("Format tanggal salah pada: " + tanggalStr);
             }
+
             
             List<DetailTransaksi> details = new ArrayList<>();
             

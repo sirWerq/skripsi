@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+<?import javafx.geometry.Insets?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<VBox spacing="25" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.warung.haryati.controller.AnalisisController" style="-fx-background-color: transparent;">
+    
+    <padding>
+        <Insets top="10" left="10" right="10" bottom="10" />
+    </padding>
+
+    <HBox alignment="CENTER_LEFT">
+        <VBox spacing="5">
+            <Text style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-fill: #2c3e50;" text="Analisis Pola Pembelian" />
+            <Text style="-fx-fill: #7f8c8d; -fx-font-size: 14px;" text="Menggunakan Algoritma FP-Growth untuk Market Basket Analysis" />
+        </VBox>
+        <Region HBox.hgrow="ALWAYS" />
+    </HBox>
+
+    <!-- Configuration Card -->
+    <VBox styleClass="card" spacing="20">
+        <Text style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Konfigurasi Parameter" />
+        
+        <HBox spacing="30" alignment="BOTTOM_LEFT">
+            <VBox spacing="8">
+                <Label text="Minimum Support (0.01 - 1.0)" style="-fx-font-weight: bold;"/>
+                <TextField fx:id="txtMinSupport" text="0.1" prefWidth="150" promptText="Contoh: 0.1"/>
+            </VBox>
+            
+            <VBox spacing="8">
+                <Label text="Minimum Confidence (0.01 - 1.0)" style="-fx-font-weight: bold;"/>
+                <TextField fx:id="txtMinConfidence" text="0.5" prefWidth="150" promptText="Contoh: 0.5"/>
+            </VBox>
+            
+            <Button onAction="#handleAnalyze" styleClass="button-primary" text="Jalankan Analisis">
+                <graphic><FontIcon iconLiteral="fas-play" iconColor="white"/></graphic>
+                <padding><Insets left="20" right="20" top="10" bottom="10"/></padding>
+            </Button>
+            
+            <ProgressIndicator fx:id="loadingIndicator" visible="false" prefWidth="30" prefHeight="30"/>
+        </HBox>
+    </VBox>
+
+    <TabPane VBox.vgrow="ALWAYS" styleClass="card" tabClosingPolicy="UNAVAILABLE" style="-fx-padding: 0;">
+        <tabs>
+            <Tab text="Frequent Itemsets">
+                <VBox spacing="15">
+                    <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+                    <TableView fx:id="tableItemsets" VBox.vgrow="ALWAYS">
+                        <columnResizePolicy>
+                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                        </columnResizePolicy>
+                        <columns>
+                            <TableColumn fx:id="colItems" text="Itemsets (Kombinasi Produk)" prefWidth="400" />
+                            <TableColumn fx:id="colSupport" text="Support" prefWidth="150" />
+                        </columns>
+
+                        <placeholder>
+                            <Label text="Belum ada data. Silakan jalankan analisis." />
+                        </placeholder>
+                    </TableView>
+                </VBox>
+            </Tab>
+            <Tab text="Association Rules">
+                <VBox spacing="15">
+                    <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+                    <TableView fx:id="tableRules" VBox.vgrow="ALWAYS">
+                        <columnResizePolicy>
+                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                        </columnResizePolicy>
+                        <columns>
+                            <TableColumn fx:id="colAntecedents" text="Jika Membeli (Antecedents)" prefWidth="250" />
+                            <TableColumn fx:id="colConsequents" text="Maka Membeli (Consequents)" prefWidth="250" />
+                            <TableColumn fx:id="colRuleSupport" text="Support" prefWidth="100" />
+                            <TableColumn fx:id="colConfidence" text="Confidence" prefWidth="100" />
+                            <TableColumn fx:id="colLift" text="Lift" prefWidth="100" />
+                        </columns>
+
+                        <placeholder>
+                            <Label text="Belum ada data atau tidak ada aturan yang memenuhi syarat." />
+                        </placeholder>
+                    </TableView>
+                </VBox>
+            </Tab>
+        </tabs>
+    </TabPane>
+</VBox>

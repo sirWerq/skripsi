@@ -31,7 +31,7 @@ public class TransaksiController {
     @FXML private Pagination pagination;
 
     private TransaksiDao transaksiDao = new TransaksiDao();
-    private final int ROWS_PER_PAGE = 10;
+    private final int ROWS_PER_PAGE = 15;
     private ObservableList<Transaksi> allTransaksi = FXCollections.observableArrayList();
 
     @FXML

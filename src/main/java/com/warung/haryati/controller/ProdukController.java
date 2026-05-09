@@ -32,7 +32,7 @@ public class ProdukController {
     @FXML private Pagination pagination;
 
     private ProdukDao produkDao = new ProdukDao();
-    private final int ROWS_PER_PAGE = 10;
+    private final int ROWS_PER_PAGE = 15;
     private ObservableList<Produk> allProduk = FXCollections.observableArrayList();
 
     @FXML

@@ -80,14 +80,15 @@ public class DashboardController {
         try (Connection conn = DBConnection.getConnection();
              Statement stmt = conn.createStatement()) {
             
-            String sql = "SELECT t.tanggal, SUM(dt.subtotal) as harian " +
+            String sql = "SELECT DATE_FORMAT(t.tanggal, '%Y-%m') as periode, SUM(dt.subtotal) as total " +
                          "FROM transaksi t JOIN detail_transaksi dt ON t.id = dt.transaksi_id " +
-                         "GROUP BY t.tanggal ORDER BY t.tanggal ASC LIMIT 7";
+                         "GROUP BY periode ORDER BY periode ASC LIMIT 12";
             
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
-                series.getData().add(new XYChart.Data<>(rs.getString("tanggal"), rs.getDouble("harian")));
+                series.getData().add(new XYChart.Data<>(rs.getString("periode"), rs.getDouble("total")));
             }
+
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -138,7 +139,12 @@ public class DashboardController {
         loadView("transaksi");
     }
     
-    @FXML private void showAnalisis() { setActive(btnAnalisis); }
+    @FXML 
+    private void showAnalisis() { 
+        setActive(btnAnalisis); 
+        loadView("analisis");
+    }
+
     @FXML private void showLaporan() { setActive(btnLaporan); }
 
     private void loadView(String fxml) {
