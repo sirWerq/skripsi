@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Text?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.warung.haryati.controller.LoginController" stylesheets="@../css/style.css" styleClass="root">
+    
+    <VBox alignment="CENTER" spacing="15.0" styleClass="card" maxWidth="400">
+        <Text style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-fill: #2c3e50;" text="Warung Haryati"/>
+        <Text style="-fx-font-size: 14px; -fx-fill: #7f8c8d;" text="Sistem Analisis Penjualan FP-Growth"/>
+        
+        <Region prefHeight="15.0" />
+
+        <VBox spacing="8.0" alignment="CENTER_LEFT">
+            <Label text="Username" style="-fx-font-weight: bold;"/>
+            <TextField fx:id="usernameField" promptText="Username" />
+        </VBox>
+
+        <VBox spacing="8.0" alignment="CENTER_LEFT">
+            <Label text="Password" style="-fx-font-weight: bold;"/>
+            <HBox spacing="0" alignment="CENTER_LEFT" styleClass="text-field" style="-fx-padding: 0;">
+                <StackPane HBox.hgrow="ALWAYS">
+                    <PasswordField fx:id="passwordField" promptText="Password" style="-fx-background-color: transparent; -fx-border-width: 0;"/>
+                    <TextField fx:id="passwordTextField" promptText="Password" visible="false" style="-fx-background-color: transparent; -fx-border-width: 0;"/>
+                </StackPane>
+                <Button fx:id="togglePasswordBtn" onAction="#togglePassword" styleClass="eye-button">
+                    <graphic>
+                        <FontIcon fx:id="eyeIcon" iconLiteral="fas-eye" iconSize="16" iconColor="#7f8c8d"/>
+                    </graphic>
+                </Button>
+            </HBox>
+        </VBox>
+
+        <Region prefHeight="10.0" />
+
+        <Button onAction="#handleLogin" text="MASUK" styleClass="button-primary" maxWidth="Infinity"/>
+        
+        <Label fx:id="errorLabel" style="-fx-text-fill: #e74c3c; -fx-font-size: 12px;" />
+    </VBox>
+</VBox>

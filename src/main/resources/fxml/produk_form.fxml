@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox spacing="15" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.warung.haryati.controller.ProdukFormController" prefWidth="400">
+    <padding>
+        <Insets top="20" left="20" right="20" bottom="20" />
+    </padding>
+
+    <VBox spacing="5">
+        <Label text="Nama Barang" />
+        <TextField fx:id="namaField" promptText="Contoh: Susu Ultra Milk" />
+    </VBox>
+
+    <HBox spacing="15">
+        <VBox spacing="5" HBox.hgrow="ALWAYS">
+            <Label text="Harga Beli" />
+            <TextField fx:id="hargaBeliField" promptText="0" />
+        </VBox>
+        <VBox spacing="5" HBox.hgrow="ALWAYS">
+            <Label text="Harga Jual" />
+            <TextField fx:id="hargaJualField" promptText="0" />
+        </VBox>
+    </HBox>
+
+    <Region prefHeight="10" />
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Batal" onAction="#handleBatal" />
+        <Button text="Simpan" onAction="#handleSimpan" styleClass="button-primary" />
+    </HBox>
+</VBox>

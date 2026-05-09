@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+<?import javafx.geometry.Insets?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<VBox spacing="20" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.warung.haryati.controller.ProdukController" style="-fx-background-color: #f8f9fa;">
+    <padding>
+        <Insets top="20" left="20" right="20" bottom="20" />
+    </padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="20">
+        <Text style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Data Produk" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Button onAction="#handleTambah" styleClass="button-primary" text="Tambah Produk">
+            <graphic><FontIcon iconLiteral="fas-plus" iconColor="white"/></graphic>
+        </Button>
+    </HBox>
+
+    <VBox VBox.vgrow="ALWAYS" spacing="10">
+        <TableView fx:id="tableProduk" VBox.vgrow="ALWAYS" styleClass="card">
+            <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
+            <columns>
+                <TableColumn fx:id="colId" prefWidth="50" text="ID" />
+                <TableColumn fx:id="colNama" prefWidth="250" text="Nama Barang" />
+                <TableColumn fx:id="colHargaBeli" prefWidth="120" text="Harga Beli" />
+                <TableColumn fx:id="colHargaJual" prefWidth="120" text="Harga Jual" />
+                <TableColumn fx:id="colAksi" prefWidth="150" text="Aksi" />
+            </columns>
+        </TableView>
+        <Pagination fx:id="pagination" maxPageIndicatorCount="5" />
+    </VBox>
+</VBox>

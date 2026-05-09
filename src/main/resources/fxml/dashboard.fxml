@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+<?import javafx.geometry.Insets?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+
+<HBox prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.warung.haryati.controller.DashboardController" stylesheets="@../css/style.css" styleClass="root">
+    
+    <!-- Sidebar -->
+    <VBox spacing="0" styleClass="sidebar" prefWidth="240">
+        <padding>
+            <Insets top="30" />
+        </padding>
+        
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <padding>
+                <Insets left="20" bottom="30" />
+            </padding>
+            <FontIcon iconLiteral="fas-store" iconSize="24" iconColor="white"/>
+            <Text style="-fx-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;" text="Warung Haryati" />
+        </HBox>
+
+        <Button fx:id="btnDashboard" onAction="#showDashboard" maxWidth="Infinity" styleClass="sidebar-button, sidebar-button-active" text="Dashboard">
+            <graphic><FontIcon iconLiteral="fas-home" iconSize="16" iconColor="#adb5bd"/></graphic>
+        </Button>
+        <Button fx:id="btnProduk" onAction="#showProduk" maxWidth="Infinity" styleClass="sidebar-button" text="Data Produk">
+            <graphic><FontIcon iconLiteral="fas-box" iconSize="16" iconColor="#adb5bd"/></graphic>
+        </Button>
+        <Button fx:id="btnTransaksi" onAction="#showTransaksi" maxWidth="Infinity" styleClass="sidebar-button" text="Data Transaksi">
+            <graphic><FontIcon iconLiteral="fas-shopping-cart" iconSize="16" iconColor="#adb5bd"/></graphic>
+        </Button>
+        <Button fx:id="btnAnalisis" onAction="#showAnalisis" maxWidth="Infinity" styleClass="sidebar-button" text="Analisis FP-Growth">
+            <graphic><FontIcon iconLiteral="fas-brain" iconSize="16" iconColor="#adb5bd"/></graphic>
+        </Button>
+        <Button fx:id="btnLaporan" onAction="#showLaporan" maxWidth="Infinity" styleClass="sidebar-button" text="Laporan">
+            <graphic><FontIcon iconLiteral="fas-file-alt" iconSize="16" iconColor="#adb5bd"/></graphic>
+        </Button>
+        
+        <Region VBox.vgrow="ALWAYS" />
+        
+        <Button onAction="#handleLogout" maxWidth="Infinity" styleClass="sidebar-button" style="-fx-text-fill: #e74c3c;" text="Logout">
+            <graphic><FontIcon iconLiteral="fas-sign-out-alt" iconSize="16" iconColor="#e74c3c"/></graphic>
+        </Button>
+    </VBox>
+    
+    <!-- Main Content Area -->
+    <StackPane fx:id="contentArea" HBox.hgrow="ALWAYS" style="-fx-background-color: #f8f9fa;">
+        <padding>
+            <Insets top="30" left="40" right="40" bottom="30" />
+        </padding>
+        
+        <!-- Dashboard View (Initial) -->
+        <VBox fx:id="dashboardView" spacing="30">
+            <HBox alignment="CENTER_LEFT">
+                <Text style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-fill: #2c3e50;" text="Dashboard Overview" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Button onAction="#handleImport" styleClass="button-primary" style="-fx-background-color: #2ecc71;" text="Import Dataset">
+                    <graphic><FontIcon iconLiteral="fas-file-import" iconColor="white"/></graphic>
+                </Button>
+            </HBox>
+            
+            <!-- Stats Grid -->
+            <GridPane hgap="25" vgap="0">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="33.3" />
+                    <ColumnConstraints percentWidth="33.3" />
+                    <ColumnConstraints percentWidth="33.3" />
+                </columnConstraints>
+                
+                <VBox spacing="10" styleClass="card" GridPane.columnIndex="0">
+                    <HBox alignment="CENTER_LEFT" spacing="15">
+                        <FontIcon iconLiteral="fas-receipt" iconSize="30" iconColor="#3498db"/>
+                        <VBox>
+                            <Text style="-fx-fill: #95a5a6; -fx-font-size: 14px;" text="Total Transaksi" />
+                            <Text fx:id="txtTotalTransaksi" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="0" />
+                        </VBox>
+                    </HBox>
+                </VBox>
+                
+                <VBox spacing="10" styleClass="card" GridPane.columnIndex="1">
+                    <HBox alignment="CENTER_LEFT" spacing="15">
+                        <FontIcon iconLiteral="fas-boxes" iconSize="30" iconColor="#2ecc71"/>
+                        <VBox>
+                            <Text style="-fx-fill: #95a5a6; -fx-font-size: 14px;" text="Total Produk" />
+                            <Text fx:id="txtTotalProduk" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="0" />
+                        </VBox>
+                    </HBox>
+                </VBox>
+                
+                <VBox spacing="10" styleClass="card" GridPane.columnIndex="2">
+                    <HBox alignment="CENTER_LEFT" spacing="15">
+                        <FontIcon iconLiteral="fas-money-bill-wave" iconSize="30" iconColor="#f1c40f"/>
+                        <VBox>
+                            <Text style="-fx-fill: #95a5a6; -fx-font-size: 14px;" text="Total Pendapatan" />
+                            <Text fx:id="txtTotalPendapatan" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Rp 0" />
+                        </VBox>
+                    </HBox>
+                </VBox>
+            </GridPane>
+            
+            <!-- Chart Area -->
+            <VBox VBox.vgrow="ALWAYS" styleClass="card" spacing="15">
+                <Text style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Tren Penjualan (Harian)" />
+                <LineChart fx:id="salesChart" legendSide="BOTTOM" createSymbols="false" style="-fx-background-color: transparent;">
+                    <xAxis><CategoryAxis side="BOTTOM" label="Tanggal" /></xAxis>
+                    <yAxis><NumberAxis side="LEFT" label="Pendapatan (Rp)" /></yAxis>
+                </LineChart>
+            </VBox>
+        </VBox>
+    </StackPane>
+</HBox>
