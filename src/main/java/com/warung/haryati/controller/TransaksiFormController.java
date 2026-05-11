@@ -83,12 +83,24 @@ public class TransaksiFormController {
     @FXML
     private void handleTambahItem() {
         Produk p = produkCombo.getValue();
-        String qtyStr = qtyField.getText();
+        String qtyStr = qtyField.getText().trim();
         
-        if (p == null || qtyStr.isEmpty()) return;
+        if (p == null) {
+            showAlert("Error", "Pilih produk terlebih dahulu!");
+            return;
+        }
+        if (qtyStr.isEmpty()) {
+            showAlert("Error", "Masukkan kuantitas!");
+            return;
+        }
         
         try {
             int qty = Integer.parseInt(qtyStr);
+            if (qty <= 0) {
+                showAlert("Error", "Kuantitas harus lebih dari 0!");
+                return;
+            }
+
             double subtotal = p.getHargaJual() * qty;
             double laba = (p.getHargaJual() - p.getHargaBeli()) * qty;
             
@@ -103,7 +115,7 @@ public class TransaksiFormController {
             
             qtyField.clear();
         } catch (NumberFormatException e) {
-            // Error handling
+            showAlert("Error", "Kuantitas harus berupa angka bulat!");
         }
     }
 
@@ -114,7 +126,15 @@ public class TransaksiFormController {
 
     @FXML
     private void handleSimpan() {
-        if (items.isEmpty()) return;
+        if (items.isEmpty()) {
+            showAlert("Error", "Tambahkan minimal satu item!");
+            return;
+        }
+
+        if (tanggalPicker.getValue() == null) {
+            showAlert("Error", "Pilih tanggal transaksi!");
+            return;
+        }
         
         try {
             if (currentTransaksi == null) {
@@ -128,9 +148,16 @@ public class TransaksiFormController {
             saved = true;
             closeStage();
         } catch (SQLException e) {
-            e.printStackTrace();
-            // Optional: Show alert here too
+            showAlert("Database Error", "Gagal menyimpan transaksi: " + e.getMessage());
         }
+    }
+
+    private void showAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 
     @FXML private void handleBatal() { closeStage(); }

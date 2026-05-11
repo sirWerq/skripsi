@@ -18,7 +18,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
+
 import java.util.Optional;
 
 public class ProdukController {

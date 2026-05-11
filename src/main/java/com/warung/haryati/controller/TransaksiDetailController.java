@@ -55,7 +55,7 @@ public class TransaksiDetailController {
     public void setData(Transaksi t) {
         txtId.setText("#" + t.getId());
         txtTanggal.setText(t.getTanggal().toString());
-        txtTotal.setText("Rp " + t.getTotal());
+        txtTotal.setText(CurrencyUtil.format(t.getTotal()));
         
         try {
             List<DetailTransaksi> details = transaksiDao.getDetailsByTransaksiId(t.getId());

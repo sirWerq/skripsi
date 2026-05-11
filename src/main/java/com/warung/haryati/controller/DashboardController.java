@@ -22,8 +22,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.NumberFormat;
-import java.util.Locale;
 
 public class DashboardController {
 
@@ -145,7 +143,10 @@ public class DashboardController {
         loadView("analisis");
     }
 
-    @FXML private void showLaporan() { setActive(btnLaporan); }
+    @FXML private void showLaporan() { 
+        setActive(btnLaporan); 
+        loadView("laporan");
+    }
 
     private void loadView(String fxml) {
         try {

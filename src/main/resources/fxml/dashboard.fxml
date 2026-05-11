@@ -106,7 +106,7 @@
             
             <!-- Chart Area -->
             <VBox VBox.vgrow="ALWAYS" styleClass="card" spacing="15">
-                <Text style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Tren Penjualan (Harian)" />
+                <Text style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Tren Penjualan Per Bulan" />
                 <LineChart fx:id="salesChart" legendSide="BOTTOM" createSymbols="false" style="-fx-background-color: transparent;">
                     <xAxis><CategoryAxis side="BOTTOM" label="Tanggal" /></xAxis>
                     <yAxis><NumberAxis side="LEFT" label="Pendapatan (Rp)" /></yAxis>

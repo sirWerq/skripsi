@@ -168,4 +168,18 @@ public class TransaksiDao {
             conn.setAutoCommit(true);
         }
     }
+    public List<Transaksi> getByDateRange(Date start, Date end) throws SQLException {
+        List<Transaksi> list = new ArrayList<>();
+        String sql = "SELECT * FROM transaksi WHERE tanggal BETWEEN ? AND ? ORDER BY tanggal DESC";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setDate(1, start);
+            pstmt.setDate(2, end);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                list.add(new Transaksi(rs.getString("id"), rs.getDate("tanggal")));
+            }
+        }
+        return list;
+    }
 }

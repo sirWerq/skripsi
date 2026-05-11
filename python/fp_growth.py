@@ -27,11 +27,8 @@ def get_data_from_db():
             JOIN transaksi t ON dt.transaksi_id = t.id 
             JOIN produk p ON dt.produk_id = p.id
         """
-        # Gunakan print ke stderr agar bisa dibaca Java sebagai log tanpa mengganggu JSON di stdout
-        print("Python: Mengambil data dari database...", file=sys.stderr)
         df = pd.read_sql(query, conn)
         conn.close()
-        print(f"Python: Berhasil mengambil {len(df)} baris data.", file=sys.stderr)
         return df
     except Exception as e:
         print(f"Python Error: {str(e)}", file=sys.stderr)

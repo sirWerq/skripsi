@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+<?import javafx.geometry.Insets?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<VBox spacing="20" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.warung.haryati.controller.LaporanController" style="-fx-background-color: #f8f9fa;">
+    <padding>
+        <Insets top="20" left="20" right="20" bottom="20" />
+    </padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="20">
+        <Text style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-fill: #2c3e50;" text="Laporan Penjualan" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Button onAction="#handleExport" styleClass="button-primary" style="-fx-background-color: #2ecc71;" text="Export CSV">
+            <graphic><FontIcon iconLiteral="fas-file-export" iconColor="white"/></graphic>
+        </Button>
+    </HBox>
+
+    <HBox spacing="15" alignment="CENTER_LEFT" styleClass="card">
+        <VBox spacing="5">
+            <Label text="Tanggal Mulai" />
+            <DatePicker fx:id="dpStart" prefWidth="150" />
+        </VBox>
+        <VBox spacing="5">
+            <Label text="Tanggal Selesai" />
+            <DatePicker fx:id="dpEnd" prefWidth="150" />
+        </VBox>
+        <Button onAction="#handleFilter" styleClass="button-primary" text="Filter">
+            <graphic><FontIcon iconLiteral="fas-filter" iconColor="white"/></graphic>
+            <HBox.margin><Insets top="20" /></HBox.margin>
+        </Button>
+        <Button onAction="#handleReset" styleClass="button-outline" text="Reset">
+            <HBox.margin><Insets top="20" /></HBox.margin>
+        </Button>
+    </HBox>
+
+    <GridPane hgap="20" vgap="0">
+        <columnConstraints>
+            <ColumnConstraints percentWidth="50" />
+            <ColumnConstraints percentWidth="50" />
+        </columnConstraints>
+        
+        <VBox spacing="5" styleClass="card" GridPane.columnIndex="0">
+            <Text style="-fx-fill: #95a5a6; -fx-font-size: 14px;" text="Total Transaksi dalam Periode" />
+            <Text fx:id="txtTotalTransaksi" style="-fx-font-size: 20px; -fx-font-weight: bold;" text="0" />
+        </VBox>
+        
+        <VBox spacing="5" styleClass="card" GridPane.columnIndex="1">
+            <Text style="-fx-fill: #95a5a6; -fx-font-size: 14px;" text="Total Pendapatan dalam Periode" />
+            <Text fx:id="txtTotalPendapatan" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-fill: #27ae60;" text="Rp 0" />
+        </VBox>
+    </GridPane>
+
+    <TableView fx:id="tableLaporan" VBox.vgrow="ALWAYS" styleClass="card">
+        <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
+        <columns>
+            <TableColumn fx:id="colTanggal" prefWidth="150" text="Tanggal" />
+            <TableColumn fx:id="colId" prefWidth="120" text="ID Transaksi" />
+            <TableColumn fx:id="colItems" prefWidth="250" text="Items" />
+            <TableColumn fx:id="colTotal" prefWidth="150" text="Total" />
+        </columns>
+    </TableView>
+</VBox>
