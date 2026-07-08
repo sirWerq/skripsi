@@ -39,7 +39,8 @@ public class TransaksiController {
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colId.getStyleClass().add("center-column");
 
-        colTanggal.setCellValueFactory(new PropertyValueFactory<>("tanggal"));
+        colTanggal.setCellValueFactory(cellData -> 
+            new SimpleStringProperty(com.warung.haryati.util.DateUtil.formatShort(cellData.getValue().getTanggal())));
         colTanggal.getStyleClass().add("center-column");
 
         colTotal.setCellValueFactory(cellData -> 

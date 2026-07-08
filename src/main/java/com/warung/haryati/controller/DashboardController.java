@@ -2,7 +2,6 @@ package com.warung.haryati.controller;
 
 import com.warung.haryati.App;
 import com.warung.haryati.service.CSVService;
-import com.warung.haryati.util.CurrencyUtil;
 import com.warung.haryati.util.DBConnection;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -29,7 +28,6 @@ public class DashboardController {
     @FXML private VBox dashboardView;
     @FXML private Text txtTotalTransaksi;
     @FXML private Text txtTotalProduk;
-    @FXML private Text txtTotalPendapatan;
     @FXML private LineChart<String, Number> salesChart;
     
     @FXML private Button btnDashboard, btnProduk, btnTransaksi, btnAnalisis, btnLaporan;
@@ -59,13 +57,6 @@ public class DashboardController {
             rs = stmt.executeQuery("SELECT COUNT(*) FROM produk");
             if (rs.next()) txtTotalProduk.setText(String.valueOf(rs.getInt(1)));
             
-            // Total Pendapatan
-            rs = stmt.executeQuery("SELECT SUM(subtotal) FROM detail_transaksi");
-            if (rs.next()) {
-                double total = rs.getDouble(1);
-                txtTotalPendapatan.setText(CurrencyUtil.format(total));
-            }
-            
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -84,7 +75,12 @@ public class DashboardController {
             
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
-                series.getData().add(new XYChart.Data<>(rs.getString("periode"), rs.getDouble("total")));
+                String periode = rs.getString("periode");
+                try {
+                    java.time.YearMonth ym = java.time.YearMonth.parse(periode);
+                    periode = ym.format(java.time.format.DateTimeFormatter.ofPattern("MMM yyyy", com.warung.haryati.util.DateUtil.LOCALE_ID));
+                } catch (Exception ignored) {}
+                series.getData().add(new XYChart.Data<>(periode, rs.getDouble("total")));
             }
 
             

@@ -68,9 +68,8 @@
             <!-- Stats Grid -->
             <GridPane hgap="25" vgap="0">
                 <columnConstraints>
-                    <ColumnConstraints percentWidth="33.3" />
-                    <ColumnConstraints percentWidth="33.3" />
-                    <ColumnConstraints percentWidth="33.3" />
+                    <ColumnConstraints percentWidth="50" />
+                    <ColumnConstraints percentWidth="50" />
                 </columnConstraints>
                 
                 <VBox spacing="10" styleClass="card" GridPane.columnIndex="0">
@@ -89,16 +88,6 @@
                         <VBox>
                             <Text style="-fx-fill: #95a5a6; -fx-font-size: 14px;" text="Total Produk" />
                             <Text fx:id="txtTotalProduk" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="0" />
-                        </VBox>
-                    </HBox>
-                </VBox>
-                
-                <VBox spacing="10" styleClass="card" GridPane.columnIndex="2">
-                    <HBox alignment="CENTER_LEFT" spacing="15">
-                        <FontIcon iconLiteral="fas-money-bill-wave" iconSize="30" iconColor="#f1c40f"/>
-                        <VBox>
-                            <Text style="-fx-fill: #95a5a6; -fx-font-size: 14px;" text="Total Pendapatan" />
-                            <Text fx:id="txtTotalPendapatan" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Rp 0" />
                         </VBox>
                     </HBox>
                 </VBox>

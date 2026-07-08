@@ -55,6 +55,23 @@ public class TransaksiFormController {
     @FXML
     public void initialize() {
         tanggalPicker.setValue(LocalDate.now());
+        tanggalPicker.setConverter(new StringConverter<LocalDate>() {
+            @Override
+            public String toString(LocalDate date) {
+                return (date != null) ? com.warung.haryati.util.DateUtil.formatShort(date) : "";
+            }
+            @Override
+            public LocalDate fromString(String string) {
+                if (string != null && !string.trim().isEmpty()) {
+                    try {
+                        return LocalDate.parse(string.trim(), com.warung.haryati.util.DateUtil.FORMAT_SHORT);
+                    } catch (Exception e) {
+                        return LocalDate.now();
+                    }
+                }
+                return null;
+            }
+        });
         setupProdukCombo();
         
         colProduk.setCellValueFactory(new PropertyValueFactory<>("produkId")); 

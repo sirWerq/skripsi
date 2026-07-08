@@ -1,8 +1,12 @@
 package com.warung.haryati.controller;
 
+import com.warung.haryati.model.AnalisisResult;
+import com.warung.haryati.service.FPGrowthService;
 import com.warung.haryati.util.CurrencyUtil;
 import com.warung.haryati.util.DBConnection;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -21,46 +25,403 @@ import java.time.LocalDate;
 public class LaporanController {
 
     @FXML private DatePicker dpStart, dpEnd;
+    @FXML private TabPane tabPaneLaporan;
+
+    // TAB 1: Laba Rugi
+    @FXML private Text txtTotalTransaksiLaba, txtTotalOmsetLaba, txtTotalModalLaba, txtTotalLabaBersih;
+    @FXML private TableView<LabaRugiRow> tableLabaRugi;
+    @FXML private TableColumn<LabaRugiRow, String> colLabaTanggal, colLabaJmlTransaksi, colLabaOmset, colLabaModal, colLabaBersih;
+    private ObservableList<LabaRugiRow> labaRugiData = FXCollections.observableArrayList();
+
+    // TAB 2: Barang Terlaris
+    @FXML private TableView<BarangTerlarisRow> tableBarangTerlaris;
+    @FXML private TableColumn<BarangTerlarisRow, String> colRank, colNamaBarang, colJmlTerjual, colOmsetBarang, colLabaBarang;
+    private ObservableList<BarangTerlarisRow> barangTerlarisData = FXCollections.observableArrayList();
+
+    // TAB 3: Analisis FP-Growth
+    @FXML private ProgressIndicator laporanLoadingIndicator;
+    @FXML private TableView<FpGrowthReportRow> tableFpGrowthReport;
+    @FXML private TableColumn<FpGrowthReportRow, String> colRuleAntecedents, colRuleConsequents, colRuleSupport, colRuleConfidence, colRuleLift, colRuleRekomendasi;
+    private ObservableList<FpGrowthReportRow> fpGrowthReportData = FXCollections.observableArrayList();
+    private final FPGrowthService analysisService = new FPGrowthService();
+
+    // TAB 4: Riwayat & Detail Transaksi
     @FXML private Text txtTotalTransaksi, txtTotalPendapatan;
     @FXML private TableView<LaporanRow> tableLaporan;
     @FXML private TableColumn<LaporanRow, String> colTanggal, colId, colItems, colTotal;
-
     private ObservableList<LaporanRow> reportData = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
+        setupDatePickers();
+        setupTables();
+        setDefaultDateRange();
+        loadAllReports();
+        
+        // Load FP-Growth report automatically in background
+        handleAnalyzeFpGrowth();
+    }
+
+    private void setupDatePickers() {
+        javafx.util.StringConverter<LocalDate> converter = new javafx.util.StringConverter<>() {
+            @Override
+            public String toString(LocalDate date) {
+                return (date != null) ? com.warung.haryati.util.DateUtil.formatShort(date) : "";
+            }
+            @Override
+            public LocalDate fromString(String string) {
+                return parseFlexibleDate(string);
+            }
+        };
+        if (dpStart != null) dpStart.setConverter(converter);
+        if (dpEnd != null) dpEnd.setConverter(converter);
+    }
+
+    private void setDefaultDateRange() {
+        try (Connection conn = DBConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT MIN(DATE(tanggal)), MAX(DATE(tanggal)) FROM transaksi")) {
+            if (rs.next() && rs.getDate(1) != null) {
+                dpStart.setValue(rs.getDate(1).toLocalDate());
+                dpEnd.setValue(rs.getDate(2).toLocalDate());
+            } else {
+                dpStart.setValue(LocalDate.now().withDayOfMonth(1));
+                dpEnd.setValue(LocalDate.now());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            dpStart.setValue(LocalDate.now().withDayOfMonth(1));
+            dpEnd.setValue(LocalDate.now());
+        }
+    }
+
+    private void setupTables() {
+        // Tab 1
+        colLabaTanggal.setCellValueFactory(new PropertyValueFactory<>("tanggal"));
+        colLabaJmlTransaksi.setCellValueFactory(new PropertyValueFactory<>("jmlTransaksiStr"));
+        colLabaOmset.setCellValueFactory(new PropertyValueFactory<>("omsetStr"));
+        colLabaModal.setCellValueFactory(new PropertyValueFactory<>("modalStr"));
+        colLabaBersih.setCellValueFactory(new PropertyValueFactory<>("labaStr"));
+
+        // Tab 2
+        colRank.setCellValueFactory(new PropertyValueFactory<>("rankStr"));
+        colNamaBarang.setCellValueFactory(new PropertyValueFactory<>("namaBarang"));
+        colJmlTerjual.setCellValueFactory(new PropertyValueFactory<>("jmlTerjualStr"));
+        colOmsetBarang.setCellValueFactory(new PropertyValueFactory<>("omsetStr"));
+        colLabaBarang.setCellValueFactory(new PropertyValueFactory<>("labaStr"));
+
+        // Tab 3
+        colRuleAntecedents.setCellValueFactory(new PropertyValueFactory<>("antecedents"));
+        colRuleConsequents.setCellValueFactory(new PropertyValueFactory<>("consequents"));
+        colRuleSupport.setCellValueFactory(new PropertyValueFactory<>("supportStr"));
+        colRuleConfidence.setCellValueFactory(new PropertyValueFactory<>("confidenceStr"));
+        colRuleLift.setCellValueFactory(new PropertyValueFactory<>("liftStr"));
+        colRuleRekomendasi.setCellValueFactory(new PropertyValueFactory<>("rekomendasi"));
+
+        // Tab 4
         colTanggal.setCellValueFactory(new PropertyValueFactory<>("tanggal"));
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colItems.setCellValueFactory(new PropertyValueFactory<>("items"));
         colTotal.setCellValueFactory(new PropertyValueFactory<>("totalStr"));
-
-        // Default: Current month
-        dpStart.setValue(LocalDate.now().withDayOfMonth(1));
-        dpEnd.setValue(LocalDate.now());
-
-        loadData();
     }
 
     @FXML
     private void handleFilter() {
-        loadData();
+        loadAllReports();
     }
 
     @FXML
     private void handleReset() {
-        dpStart.setValue(LocalDate.now().withDayOfMonth(1));
-        dpEnd.setValue(LocalDate.now());
-        loadData();
+        setDefaultDateRange();
+        loadAllReports();
     }
 
-    private void loadData() {
+    private void commitDatePickers() {
+        try {
+            if (dpStart != null && dpStart.getEditor() != null && !dpStart.getEditor().getText().trim().isEmpty()) {
+                LocalDate parsed = parseFlexibleDate(dpStart.getEditor().getText().trim());
+                if (parsed != null) dpStart.setValue(parsed);
+            }
+            if (dpEnd != null && dpEnd.getEditor() != null && !dpEnd.getEditor().getText().trim().isEmpty()) {
+                LocalDate parsed = parseFlexibleDate(dpEnd.getEditor().getText().trim());
+                if (parsed != null) dpEnd.setValue(parsed);
+            }
+        } catch (Exception e) {
+            System.out.println("Gagal commit format tanggal manual: " + e.getMessage());
+        }
+    }
+
+    private LocalDate parseFlexibleDate(String text) {
+        try {
+            if (dpStart != null && dpStart.getConverter() != null) {
+                LocalDate res = dpStart.getConverter().fromString(text);
+                if (res != null) return res;
+            }
+        } catch (Exception ignored) {}
+        
+        String[] formats = {"yyyy-MM-dd", "dd/MM/yyyy", "M/d/yyyy", "MM/dd/yyyy", "dd-MM-yyyy", "yyyy/MM/dd"};
+        for (String fmt : formats) {
+            try {
+                return LocalDate.parse(text, java.time.format.DateTimeFormatter.ofPattern(fmt));
+            } catch (Exception ignored) {}
+        }
+        return null;
+    }
+
+    private void loadAllReports() {
+        commitDatePickers();
+        System.out.println("=== FILTERING REPORT ===");
+        System.out.println("Start Date: " + dpStart.getValue());
+        System.out.println("End Date: " + dpEnd.getValue());
+        loadLabaRugi();
+        loadBarangTerlaris();
+        loadDetailTransaksi();
+    }
+
+    // --- TAB 1 LOGIC ---
+    private void loadLabaRugi() {
+        labaRugiData.clear();
+        int totalTx = 0;
+        double grandOmset = 0;
+        double grandModal = 0;
+        double grandLaba = 0;
+
+        LocalDate start = dpStart.getValue();
+        LocalDate end = dpEnd.getValue();
+        if (start == null || end == null) return;
+
+        String sql = "SELECT DATE(t.tanggal) as tanggal, COUNT(DISTINCT t.id) as jml_transaksi, " +
+                     "SUM(dt.subtotal) as omset, " +
+                     "SUM(dt.kuantitas * p.harga_beli) as modal, " +
+                     "SUM(dt.laba) as laba_bersih " +
+                     "FROM transaksi t " +
+                     "JOIN detail_transaksi dt ON t.id = dt.transaksi_id " +
+                     "JOIN produk p ON dt.produk_id = p.id " +
+                     "WHERE DATE(t.tanggal) BETWEEN ? AND ? " +
+                     "GROUP BY DATE(t.tanggal) ORDER BY tanggal DESC";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setDate(1, Date.valueOf(start));
+            pstmt.setDate(2, Date.valueOf(end));
+            ResultSet rs = pstmt.executeQuery();
+            
+            while (rs.next()) {
+                String tgl = com.warung.haryati.util.DateUtil.formatShort(rs.getString("tanggal"));
+                int jmlTx = rs.getInt("jml_transaksi");
+                double omset = rs.getDouble("omset");
+                double modal = rs.getDouble("modal");
+                double laba = rs.getDouble("laba_bersih");
+                
+                labaRugiData.add(new LabaRugiRow(tgl, jmlTx, omset, modal, laba));
+                totalTx += jmlTx;
+                grandOmset += omset;
+                grandModal += modal;
+                grandLaba += laba;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Error", "Gagal memuat Laporan Laba Rugi: " + e.getMessage());
+        }
+
+        tableLabaRugi.setItems(labaRugiData);
+        tableLabaRugi.refresh();
+        txtTotalTransaksiLaba.setText(String.valueOf(totalTx));
+        txtTotalOmsetLaba.setText(CurrencyUtil.format(grandOmset));
+        txtTotalModalLaba.setText(CurrencyUtil.format(grandModal));
+        txtTotalLabaBersih.setText(CurrencyUtil.format(grandLaba));
+    }
+
+    @FXML
+    private void handleExportLabaRugi() {
+        commitDatePickers();
+        if (labaRugiData.isEmpty()) {
+            showAlert(Alert.AlertType.WARNING, "Peringatan", "Tidak ada data Laba Rugi untuk diexport.");
+            return;
+        }
+
+        LocalDate start = dpStart.getValue();
+        LocalDate end = dpEnd.getValue();
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Simpan Laporan Laba Rugi");
+        fileChooser.setInitialFileName("Laporan_Laba_Rugi_" + start + "_sd_" + end + ".csv");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+        
+        File file = fileChooser.showSaveDialog(null);
+        if (file != null) {
+            try (FileWriter writer = new FileWriter(file)) {
+                writer.write("Tanggal;Jumlah Transaksi;Omset Penjualan;Modal (HPP);Laba Bersih\n");
+                for (LabaRugiRow row : labaRugiData) {
+                    writer.write(String.format("%s;%s;%.0f;%.0f;%.0f\n",
+                        row.getTanggal(), row.getJmlTransaksiStr(), row.getOmset(), row.getModal(), row.getLaba()));
+                }
+                showAlert(Alert.AlertType.INFORMATION, "Sukses", "Laporan Laba Rugi berhasil diexport (" + labaRugiData.size() + " baris).");
+            } catch (IOException e) {
+                showAlert(Alert.AlertType.ERROR, "Error", "Gagal export Laporan Laba Rugi: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // --- TAB 2 LOGIC ---
+    private void loadBarangTerlaris() {
+        barangTerlarisData.clear();
+        LocalDate start = dpStart.getValue();
+        LocalDate end = dpEnd.getValue();
+        if (start == null || end == null) return;
+
+        String sql = "SELECT p.nama_barang, SUM(dt.kuantitas) as total_terjual, " +
+                     "SUM(dt.subtotal) as total_pendapatan, SUM(dt.laba) as total_laba " +
+                     "FROM detail_transaksi dt " +
+                     "JOIN produk p ON dt.produk_id = p.id " +
+                     "JOIN transaksi t ON dt.transaksi_id = t.id " +
+                     "WHERE DATE(t.tanggal) BETWEEN ? AND ? " +
+                     "GROUP BY p.id, p.nama_barang " +
+                     "ORDER BY total_terjual DESC";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setDate(1, Date.valueOf(start));
+            pstmt.setDate(2, Date.valueOf(end));
+            ResultSet rs = pstmt.executeQuery();
+            
+            int rank = 1;
+            while (rs.next()) {
+                barangTerlarisData.add(new BarangTerlarisRow(
+                    rank++,
+                    rs.getString("nama_barang"),
+                    rs.getInt("total_terjual"),
+                    rs.getDouble("total_pendapatan"),
+                    rs.getDouble("total_laba")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Error", "Gagal memuat Laporan Barang Terlaris: " + e.getMessage());
+        }
+
+        tableBarangTerlaris.setItems(barangTerlarisData);
+        tableBarangTerlaris.refresh();
+    }
+
+    @FXML
+    private void handleExportBarangTerlaris() {
+        commitDatePickers();
+        if (barangTerlarisData.isEmpty()) {
+            showAlert(Alert.AlertType.WARNING, "Peringatan", "Tidak ada data Barang Terlaris untuk diexport.");
+            return;
+        }
+
+        LocalDate start = dpStart.getValue();
+        LocalDate end = dpEnd.getValue();
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Simpan Laporan Barang Terlaris");
+        fileChooser.setInitialFileName("Laporan_Barang_Terlaris_" + start + "_sd_" + end + ".csv");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+        
+        File file = fileChooser.showSaveDialog(null);
+        if (file != null) {
+            try (FileWriter writer = new FileWriter(file)) {
+                writer.write("Peringkat;Nama Barang;Kuantitas Terjual;Total Omset;Total Laba\n");
+                for (BarangTerlarisRow row : barangTerlarisData) {
+                    writer.write(String.format("%s;\"%s\";%s;%.0f;%.0f\n",
+                        row.getRankStr(), row.getNamaBarang(), row.getJmlTerjualStr(), row.getOmset(), row.getLaba()));
+                }
+                showAlert(Alert.AlertType.INFORMATION, "Sukses", "Laporan Barang Terlaris berhasil diexport (" + barangTerlarisData.size() + " baris).");
+            } catch (IOException e) {
+                showAlert(Alert.AlertType.ERROR, "Error", "Gagal export Laporan Barang Terlaris: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // --- TAB 3 LOGIC ---
+    private void handleAnalyzeFpGrowth() {
+        double minSup = 0.02;
+        double minConf = 0.5;
+        laporanLoadingIndicator.setVisible(true);
+        
+        new Thread(() -> {
+            try {
+                AnalisisResult result = analysisService.runAnalysis(minSup, minConf);
+                
+                Platform.runLater(() -> {
+                    laporanLoadingIndicator.setVisible(false);
+                    fpGrowthReportData.clear();
+                    if (result.getError() != null) {
+                        showAlert(Alert.AlertType.ERROR, "Error Python", result.getError());
+                    } else if (result.getAssociation_rules() != null) {
+                        for (AnalisisResult.AssociationRule rule : result.getAssociation_rules()) {
+                            String rek;
+                            if (rule.getLift() > 1.0) {
+                                rek = String.format("Bundling / dekatkan posisi produk [%s] dengan [%s] (Peluang beli bersamaan %.0f%%)",
+                                    rule.getAntecedentsString(), rule.getConsequentsString(), rule.getConfidence() * 100);
+                            } else {
+                                rek = String.format("Buat promo diskon bersyarat untuk [%s] setiap pembelian [%s]",
+                                    rule.getConsequentsString(), rule.getAntecedentsString());
+                            }
+                            fpGrowthReportData.add(new FpGrowthReportRow(
+                                rule.getAntecedentsString(),
+                                rule.getConsequentsString(),
+                                rule.getSupport(),
+                                rule.getConfidence(),
+                                rule.getLift(),
+                                rek
+                            ));
+                        }
+                        tableFpGrowthReport.setItems(fpGrowthReportData);
+                    }
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> {
+                    laporanLoadingIndicator.setVisible(false);
+                    showAlert(Alert.AlertType.ERROR, "Error", "Gagal menjalankan analisis FP-Growth: " + e.getMessage());
+                    e.printStackTrace();
+                });
+            }
+        }).start();
+    }
+
+    @FXML
+    private void handleExportFpGrowth() {
+        if (fpGrowthReportData.isEmpty()) {
+            showAlert(Alert.AlertType.WARNING, "Peringatan", "Tidak ada data Analisis FP-Growth untuk diexport. Silakan jalankan analisis terlebih dahulu.");
+            return;
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Simpan Laporan Analisis FP-Growth");
+        fileChooser.setInitialFileName("Laporan_Analisis_FPGrowth_" + LocalDate.now() + ".csv");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+        
+        File file = fileChooser.showSaveDialog(null);
+        if (file != null) {
+            try (FileWriter writer = new FileWriter(file)) {
+                writer.write("Jika Membeli (Antecedents);Maka Membeli (Consequents);Support;Confidence;Lift Ratio;Rekomendasi Strategi Bisnis\n");
+                for (FpGrowthReportRow row : fpGrowthReportData) {
+                    writer.write(String.format("\"%s\";\"%s\";%.3f;%.3f;%.3f;\"%s\"\n",
+                        row.getAntecedents(), row.getConsequents(), row.getSupport(), row.getConfidence(), row.getLift(), row.getRekomendasi()));
+                }
+                showAlert(Alert.AlertType.INFORMATION, "Sukses", "Laporan Analisis FP-Growth berhasil diexport (" + fpGrowthReportData.size() + " baris).");
+            } catch (IOException e) {
+                showAlert(Alert.AlertType.ERROR, "Error", "Gagal export Laporan FP-Growth: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // --- TAB 4 LOGIC ---
+    private void loadDetailTransaksi() {
         reportData.clear();
         double grandTotal = 0;
         int count = 0;
 
         LocalDate start = dpStart.getValue();
         LocalDate end = dpEnd.getValue();
-
         if (start == null || end == null) return;
 
         String sql = "SELECT t.id, t.tanggal, SUM(dt.subtotal) as total_amount, " +
@@ -68,7 +429,7 @@ public class LaporanController {
                      "FROM transaksi t " +
                      "JOIN detail_transaksi dt ON t.id = dt.transaksi_id " +
                      "JOIN produk p ON dt.produk_id = p.id " +
-                     "WHERE t.tanggal BETWEEN ? AND ? " +
+                     "WHERE DATE(t.tanggal) BETWEEN ? AND ? " +
                      "GROUP BY t.id ORDER BY t.tanggal DESC";
 
         try (Connection conn = DBConnection.getConnection();
@@ -81,7 +442,7 @@ public class LaporanController {
             while (rs.next()) {
                 double total = rs.getDouble("total_amount");
                 reportData.add(new LaporanRow(
-                    rs.getDate("tanggal").toString(),
+                    com.warung.haryati.util.DateUtil.formatShort(rs.getDate("tanggal")),
                     rs.getString("id"),
                     rs.getString("items"),
                     total
@@ -91,18 +452,20 @@ public class LaporanController {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Error", "Gagal memuat data laporan: " + e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Error", "Gagal memuat data laporan detail transaksi: " + e.getMessage());
         }
 
         tableLaporan.setItems(reportData);
+        tableLaporan.refresh();
         txtTotalTransaksi.setText(String.valueOf(count));
         txtTotalPendapatan.setText(CurrencyUtil.format(grandTotal));
     }
 
     @FXML
     private void handleExport() {
+        commitDatePickers();
         if (reportData.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Peringatan", "Tidak ada data untuk diexport.");
+            showAlert(Alert.AlertType.WARNING, "Peringatan", "Tidak ada data transaksi untuk diexport.");
             return;
         }
 
@@ -110,7 +473,7 @@ public class LaporanController {
         LocalDate end = dpEnd.getValue();
 
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Simpan Laporan Detail");
+        fileChooser.setTitle("Simpan Laporan Detail Penjualan");
         fileChooser.setInitialFileName("Laporan_Detail_Penjualan_" + start + "_sd_" + end + ".csv");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
         
@@ -121,7 +484,7 @@ public class LaporanController {
                          "FROM transaksi t " +
                          "JOIN detail_transaksi dt ON t.id = dt.transaksi_id " +
                          "JOIN produk p ON dt.produk_id = p.id " +
-                         "WHERE t.tanggal BETWEEN ? AND ? " +
+                         "WHERE DATE(t.tanggal) BETWEEN ? AND ? " +
                          "ORDER BY t.tanggal DESC, t.id ASC";
 
             try (Connection conn = DBConnection.getConnection();
@@ -138,7 +501,7 @@ public class LaporanController {
                 while (rs.next()) {
                     writer.write(String.format("%s;%s;\"%s\";%.0f;%.0f;%d;%.0f;%.0f\n", 
                         rs.getString("id"),
-                        rs.getDate("tanggal").toString(),
+                        com.warung.haryati.util.DateUtil.formatShort(rs.getDate("tanggal")),
                         rs.getString("nama_barang"),
                         rs.getDouble("harga_beli"),
                         rs.getDouble("harga_jual"),
@@ -147,9 +510,9 @@ public class LaporanController {
                         rs.getDouble("laba")));
                     count++;
                 }
-                showAlert(Alert.AlertType.INFORMATION, "Sukses", "Laporan detail berhasil diexport (" + count + " baris).");
+                showAlert(Alert.AlertType.INFORMATION, "Sukses", "Laporan detail transaksi berhasil diexport (" + count + " baris).");
             } catch (SQLException | IOException e) {
-                showAlert(Alert.AlertType.ERROR, "Error", "Gagal export laporan: " + e.getMessage());
+                showAlert(Alert.AlertType.ERROR, "Error", "Gagal export laporan detail: " + e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -161,6 +524,109 @@ public class LaporanController {
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+
+    // --- DATA ROW MODELS ---
+    public static class LabaRugiRow {
+        private final SimpleStringProperty tanggal;
+        private final SimpleIntegerProperty jmlTransaksi;
+        private final SimpleStringProperty jmlTransaksiStr;
+        private final SimpleDoubleProperty omset;
+        private final SimpleStringProperty omsetStr;
+        private final SimpleDoubleProperty modal;
+        private final SimpleStringProperty modalStr;
+        private final SimpleDoubleProperty laba;
+        private final SimpleStringProperty labaStr;
+
+        public LabaRugiRow(String tanggal, int jmlTransaksi, double omset, double modal, double laba) {
+            this.tanggal = new SimpleStringProperty(tanggal);
+            this.jmlTransaksi = new SimpleIntegerProperty(jmlTransaksi);
+            this.jmlTransaksiStr = new SimpleStringProperty(String.valueOf(jmlTransaksi));
+            this.omset = new SimpleDoubleProperty(omset);
+            this.omsetStr = new SimpleStringProperty(CurrencyUtil.format(omset));
+            this.modal = new SimpleDoubleProperty(modal);
+            this.modalStr = new SimpleStringProperty(CurrencyUtil.format(modal));
+            this.laba = new SimpleDoubleProperty(laba);
+            this.labaStr = new SimpleStringProperty(CurrencyUtil.format(laba));
+        }
+
+        public String getTanggal() { return tanggal.get(); }
+        public int getJmlTransaksi() { return jmlTransaksi.get(); }
+        public String getJmlTransaksiStr() { return jmlTransaksiStr.get(); }
+        public double getOmset() { return omset.get(); }
+        public String getOmsetStr() { return omsetStr.get(); }
+        public double getModal() { return modal.get(); }
+        public String getModalStr() { return modalStr.get(); }
+        public double getLaba() { return laba.get(); }
+        public String getLabaStr() { return labaStr.get(); }
+    }
+
+    public static class BarangTerlarisRow {
+        private final SimpleIntegerProperty rank;
+        private final SimpleStringProperty rankStr;
+        private final SimpleStringProperty namaBarang;
+        private final SimpleIntegerProperty jmlTerjual;
+        private final SimpleStringProperty jmlTerjualStr;
+        private final SimpleDoubleProperty omset;
+        private final SimpleStringProperty omsetStr;
+        private final SimpleDoubleProperty laba;
+        private final SimpleStringProperty labaStr;
+
+        public BarangTerlarisRow(int rank, String namaBarang, int jmlTerjual, double omset, double laba) {
+            this.rank = new SimpleIntegerProperty(rank);
+            this.rankStr = new SimpleStringProperty(String.valueOf(rank));
+            this.namaBarang = new SimpleStringProperty(namaBarang);
+            this.jmlTerjual = new SimpleIntegerProperty(jmlTerjual);
+            this.jmlTerjualStr = new SimpleStringProperty(String.valueOf(jmlTerjual));
+            this.omset = new SimpleDoubleProperty(omset);
+            this.omsetStr = new SimpleStringProperty(CurrencyUtil.format(omset));
+            this.laba = new SimpleDoubleProperty(laba);
+            this.labaStr = new SimpleStringProperty(CurrencyUtil.format(laba));
+        }
+
+        public int getRank() { return rank.get(); }
+        public String getRankStr() { return rankStr.get(); }
+        public String getNamaBarang() { return namaBarang.get(); }
+        public int getJmlTerjual() { return jmlTerjual.get(); }
+        public String getJmlTerjualStr() { return jmlTerjualStr.get(); }
+        public double getOmset() { return omset.get(); }
+        public String getOmsetStr() { return omsetStr.get(); }
+        public double getLaba() { return laba.get(); }
+        public String getLabaStr() { return labaStr.get(); }
+    }
+
+    public static class FpGrowthReportRow {
+        private final SimpleStringProperty antecedents;
+        private final SimpleStringProperty consequents;
+        private final SimpleDoubleProperty support;
+        private final SimpleStringProperty supportStr;
+        private final SimpleDoubleProperty confidence;
+        private final SimpleStringProperty confidenceStr;
+        private final SimpleDoubleProperty lift;
+        private final SimpleStringProperty liftStr;
+        private final SimpleStringProperty rekomendasi;
+
+        public FpGrowthReportRow(String antecedents, String consequents, double support, double confidence, double lift, String rekomendasi) {
+            this.antecedents = new SimpleStringProperty(antecedents);
+            this.consequents = new SimpleStringProperty(consequents);
+            this.support = new SimpleDoubleProperty(support);
+            this.supportStr = new SimpleStringProperty(String.format("%.3f", support));
+            this.confidence = new SimpleDoubleProperty(confidence);
+            this.confidenceStr = new SimpleStringProperty(String.format("%.3f", confidence));
+            this.lift = new SimpleDoubleProperty(lift);
+            this.liftStr = new SimpleStringProperty(String.format("%.3f", lift));
+            this.rekomendasi = new SimpleStringProperty(rekomendasi);
+        }
+
+        public String getAntecedents() { return antecedents.get(); }
+        public String getConsequents() { return consequents.get(); }
+        public double getSupport() { return support.get(); }
+        public String getSupportStr() { return supportStr.get(); }
+        public double getConfidence() { return confidence.get(); }
+        public String getConfidenceStr() { return confidenceStr.get(); }
+        public double getLift() { return lift.get(); }
+        public String getLiftStr() { return liftStr.get(); }
+        public String getRekomendasi() { return rekomendasi.get(); }
     }
 
     public static class LaporanRow {

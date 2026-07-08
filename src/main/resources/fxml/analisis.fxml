@@ -28,7 +28,7 @@
         <HBox spacing="30" alignment="BOTTOM_LEFT">
             <VBox spacing="8">
                 <Label text="Minimum Support (0.01 - 1.0)" style="-fx-font-weight: bold;"/>
-                <TextField fx:id="txtMinSupport" text="0.1" prefWidth="150" promptText="Contoh: 0.1"/>
+                <TextField fx:id="txtMinSupport" text="0.02" prefWidth="150" promptText="Contoh: 0.02"/>
             </VBox>
             
             <VBox spacing="8">

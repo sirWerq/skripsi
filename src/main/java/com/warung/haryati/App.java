@@ -14,6 +14,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+        java.util.Locale.setDefault(new java.util.Locale("id", "ID"));
         scene = new Scene(loadFXML("login"), 1000, 700);
         stage.setScene(scene);
         stage.setTitle("Warung Haryati - Analisis FP-Growth");

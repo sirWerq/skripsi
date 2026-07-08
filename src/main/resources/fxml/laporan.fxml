@@ -6,62 +6,186 @@
 <?import javafx.geometry.Insets?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<VBox spacing="20" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+<VBox spacing="15" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
       fx:controller="com.warung.haryati.controller.LaporanController" style="-fx-background-color: #f8f9fa;">
     <padding>
         <Insets top="20" left="20" right="20" bottom="20" />
     </padding>
 
+    <!-- Header & Filter Bar -->
     <HBox alignment="CENTER_LEFT" spacing="20">
-        <Text style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-fill: #2c3e50;" text="Laporan Penjualan" />
+        <VBox>
+            <Text style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-fill: #2c3e50;" text="Laporan &amp; Analisis Bisnis" />
+            <Text style="-fx-font-size: 13px; -fx-fill: #7f8c8d;" text="4 Laporan Eksekutif untuk Manajemen Warung Haryati" />
+        </VBox>
         <Region HBox.hgrow="ALWAYS" />
-        <Button onAction="#handleExport" styleClass="button-primary" style="-fx-background-color: #2ecc71;" text="Export CSV">
-            <graphic><FontIcon iconLiteral="fas-file-export" iconColor="white"/></graphic>
-        </Button>
+        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="card" style="-fx-padding: 10 15;">
+            <VBox spacing="2">
+                <Label style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #6c757d;" text="DARI TANGGAL" />
+                <DatePicker fx:id="dpStart" prefWidth="130" />
+            </VBox>
+            <VBox spacing="2">
+                <Label style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #6c757d;" text="SAMPAI TANGGAL" />
+                <DatePicker fx:id="dpEnd" prefWidth="130" />
+            </VBox>
+            <Button onAction="#handleFilter" styleClass="button-primary" text="Filter">
+                <graphic><FontIcon iconLiteral="fas-filter" iconColor="white"/></graphic>
+                <HBox.margin><Insets top="14" /></HBox.margin>
+            </Button>
+            <Button onAction="#handleReset" styleClass="button-outline" text="Reset">
+                <HBox.margin><Insets top="14" /></HBox.margin>
+            </Button>
+        </HBox>
     </HBox>
 
-    <HBox spacing="15" alignment="CENTER_LEFT" styleClass="card">
-        <VBox spacing="5">
-            <Label text="Tanggal Mulai" />
-            <DatePicker fx:id="dpStart" prefWidth="150" />
-        </VBox>
-        <VBox spacing="5">
-            <Label text="Tanggal Selesai" />
-            <DatePicker fx:id="dpEnd" prefWidth="150" />
-        </VBox>
-        <Button onAction="#handleFilter" styleClass="button-primary" text="Filter">
-            <graphic><FontIcon iconLiteral="fas-filter" iconColor="white"/></graphic>
-            <HBox.margin><Insets top="20" /></HBox.margin>
-        </Button>
-        <Button onAction="#handleReset" styleClass="button-outline" text="Reset">
-            <HBox.margin><Insets top="20" /></HBox.margin>
-        </Button>
-    </HBox>
-
-    <GridPane hgap="20" vgap="0">
-        <columnConstraints>
-            <ColumnConstraints percentWidth="50" />
-            <ColumnConstraints percentWidth="50" />
-        </columnConstraints>
+    <!-- TabPane 4 Laporan -->
+    <TabPane fx:id="tabPaneLaporan" VBox.vgrow="ALWAYS" tabClosingPolicy="UNAVAILABLE" styleClass="card" style="-fx-padding: 10;">
         
-        <VBox spacing="5" styleClass="card" GridPane.columnIndex="0">
-            <Text style="-fx-fill: #95a5a6; -fx-font-size: 14px;" text="Total Transaksi dalam Periode" />
-            <Text fx:id="txtTotalTransaksi" style="-fx-font-size: 20px; -fx-font-weight: bold;" text="0" />
-        </VBox>
-        
-        <VBox spacing="5" styleClass="card" GridPane.columnIndex="1">
-            <Text style="-fx-fill: #95a5a6; -fx-font-size: 14px;" text="Total Pendapatan dalam Periode" />
-            <Text fx:id="txtTotalPendapatan" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-fill: #27ae60;" text="Rp 0" />
-        </VBox>
-    </GridPane>
+        <!-- TAB 1: LAPORAN PENJUALAN & LABA RUGI -->
+        <Tab text="📊 Laba Rugi &amp; Omset">
+            <VBox spacing="15">
+                <padding><Insets top="15" left="5" right="5" bottom="5" /></padding>
+                
+                <GridPane hgap="15" vgap="10">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="25" />
+                        <ColumnConstraints percentWidth="25" />
+                        <ColumnConstraints percentWidth="25" />
+                        <ColumnConstraints percentWidth="25" />
+                    </columnConstraints>
+                    
+                    <VBox spacing="5" style="-fx-background-color: #f1f3f9; -fx-background-radius: 10; -fx-padding: 12;" GridPane.columnIndex="0">
+                        <Text style="-fx-fill: #6c757d; -fx-font-size: 12px; -fx-font-weight: bold;" text="TOTAL TRANSAKSI" />
+                        <Text fx:id="txtTotalTransaksiLaba" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-fill: #2c3e50;" text="0" />
+                    </VBox>
+                    <VBox spacing="5" style="-fx-background-color: #f1f3f9; -fx-background-radius: 10; -fx-padding: 12;" GridPane.columnIndex="1">
+                        <Text style="-fx-fill: #6c757d; -fx-font-size: 12px; -fx-font-weight: bold;" text="TOTAL OMSET (KOTOR)" />
+                        <Text fx:id="txtTotalOmsetLaba" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-fill: #3498db;" text="Rp 0" />
+                    </VBox>
+                    <VBox spacing="5" style="-fx-background-color: #f1f3f9; -fx-background-radius: 10; -fx-padding: 12;" GridPane.columnIndex="2">
+                        <Text style="-fx-fill: #6c757d; -fx-font-size: 12px; -fx-font-weight: bold;" text="TOTAL MODAL (HPP)" />
+                        <Text fx:id="txtTotalModalLaba" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-fill: #e67e22;" text="Rp 0" />
+                    </VBox>
+                    <VBox spacing="5" style="-fx-background-color: #f1f3f9; -fx-background-radius: 10; -fx-padding: 12;" GridPane.columnIndex="3">
+                        <Text style="-fx-fill: #6c757d; -fx-font-size: 12px; -fx-font-weight: bold;" text="TOTAL LABA BERSIH" />
+                        <Text fx:id="txtTotalLabaBersih" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-fill: #2ecc71;" text="Rp 0" />
+                    </VBox>
+                </GridPane>
 
-    <TableView fx:id="tableLaporan" VBox.vgrow="ALWAYS" styleClass="card">
-        <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
-        <columns>
-            <TableColumn fx:id="colTanggal" prefWidth="150" text="Tanggal" />
-            <TableColumn fx:id="colId" prefWidth="120" text="ID Transaksi" />
-            <TableColumn fx:id="colItems" prefWidth="250" text="Items" />
-            <TableColumn fx:id="colTotal" prefWidth="150" text="Total" />
-        </columns>
-    </TableView>
+                <HBox alignment="CENTER_RIGHT">
+                    <Button onAction="#handleExportLabaRugi" styleClass="button-primary" style="-fx-background-color: #2ecc71;" text="Export Laba Rugi (CSV)">
+                        <graphic><FontIcon iconLiteral="fas-file-excel" iconColor="white"/></graphic>
+                    </Button>
+                </HBox>
+
+                <TableView fx:id="tableLabaRugi" VBox.vgrow="ALWAYS">
+                    <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
+                    <columns>
+                        <TableColumn fx:id="colLabaTanggal" prefWidth="120" text="Tanggal" />
+                        <TableColumn fx:id="colLabaJmlTransaksi" prefWidth="100" text="Jml Transaksi" />
+                        <TableColumn fx:id="colLabaOmset" prefWidth="150" text="Omset Penjualan" />
+                        <TableColumn fx:id="colLabaModal" prefWidth="150" text="Modal (HPP)" />
+                        <TableColumn fx:id="colLabaBersih" prefWidth="150" text="Laba Bersih" />
+                    </columns>
+                </TableView>
+            </VBox>
+        </Tab>
+
+        <!-- TAB 2: LAPORAN BARANG TERLARIS -->
+        <Tab text="🏆 Barang Terlaris">
+            <VBox spacing="15">
+                <padding><Insets top="15" left="5" right="5" bottom="5" /></padding>
+                
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <VBox>
+                        <Text style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-fill: #2c3e50;" text="Peringkat Kontribusi Produk" />
+                        <Text style="-fx-font-size: 12px; -fx-fill: #7f8c8d;" text="Menampilkan produk terlaris berdasarkan kuantitas terjual dan sumbangan laba." />
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Button onAction="#handleExportBarangTerlaris" styleClass="button-primary" style="-fx-background-color: #2ecc71;" text="Export Barang Terlaris (CSV)">
+                        <graphic><FontIcon iconLiteral="fas-file-excel" iconColor="white"/></graphic>
+                    </Button>
+                </HBox>
+
+                <TableView fx:id="tableBarangTerlaris" VBox.vgrow="ALWAYS">
+                    <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
+                    <columns>
+                        <TableColumn fx:id="colRank" prefWidth="60" text="No" />
+                        <TableColumn fx:id="colNamaBarang" prefWidth="250" text="Nama Barang" />
+                        <TableColumn fx:id="colJmlTerjual" prefWidth="120" text="Terjual (Pcs)" />
+                        <TableColumn fx:id="colOmsetBarang" prefWidth="150" text="Total Omset" />
+                        <TableColumn fx:id="colLabaBarang" prefWidth="150" text="Total Laba" />
+                    </columns>
+                </TableView>
+            </VBox>
+        </Tab>
+
+        <!-- TAB 3: LAPORAN ANALISIS FP-GROWTH -->
+        <Tab text="🧠 Analisis FP-Growth">
+            <VBox spacing="15">
+                <padding><Insets top="15" left="5" right="5" bottom="5" /></padding>
+                
+                <HBox alignment="CENTER_RIGHT" spacing="15" style="-fx-background-color: #f1f3f9; -fx-background-radius: 10; -fx-padding: 12;">
+                    <ProgressIndicator fx:id="laporanLoadingIndicator" prefWidth="25" prefHeight="25" visible="false" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Button onAction="#handleExportFpGrowth" styleClass="button-primary" style="-fx-background-color: #2ecc71;" text="Export Laporan FP-Growth (CSV)">
+                        <graphic><FontIcon iconLiteral="fas-file-export" iconColor="white"/></graphic>
+                    </Button>
+                </HBox>
+
+                <TableView fx:id="tableFpGrowthReport" VBox.vgrow="ALWAYS">
+                    <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
+                    <columns>
+                        <TableColumn fx:id="colRuleAntecedents" prefWidth="140" text="Jika Membeli" />
+                        <TableColumn fx:id="colRuleConsequents" prefWidth="140" text="Maka Membeli" />
+                        <TableColumn fx:id="colRuleSupport" prefWidth="75" text="Support" />
+                        <TableColumn fx:id="colRuleConfidence" prefWidth="75" text="Confidence" />
+                        <TableColumn fx:id="colRuleLift" prefWidth="75" text="Lift" />
+                        <TableColumn fx:id="colRuleRekomendasi" prefWidth="300" text="💡 Rekomendasi Strategi Bisnis" />
+                    </columns>
+                </TableView>
+            </VBox>
+        </Tab>
+
+        <!-- TAB 4: RIWAYAT & DETAIL TRANSAKSI -->
+        <Tab text="📝 Riwayat Transaksi">
+            <VBox spacing="15">
+                <padding><Insets top="15" left="5" right="5" bottom="5" /></padding>
+                
+                <GridPane hgap="20" vgap="0">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="50" />
+                        <ColumnConstraints percentWidth="50" />
+                    </columnConstraints>
+                    
+                    <VBox spacing="5" style="-fx-background-color: #f1f3f9; -fx-background-radius: 10; -fx-padding: 12;" GridPane.columnIndex="0">
+                        <Text style="-fx-fill: #6c757d; -fx-font-size: 12px; -fx-font-weight: bold;" text="TOTAL TRANSAKSI DALAM PERIODE" />
+                        <Text fx:id="txtTotalTransaksi" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-fill: #2c3e50;" text="0" />
+                    </VBox>
+                    
+                    <VBox spacing="5" style="-fx-background-color: #f1f3f9; -fx-background-radius: 10; -fx-padding: 12;" GridPane.columnIndex="1">
+                        <Text style="-fx-fill: #6c757d; -fx-font-size: 12px; -fx-font-weight: bold;" text="TOTAL PENDAPATAN DALAM PERIODE" />
+                        <Text fx:id="txtTotalPendapatan" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-fill: #27ae60;" text="Rp 0" />
+                    </VBox>
+                </GridPane>
+
+                <HBox alignment="CENTER_RIGHT">
+                    <Button onAction="#handleExport" styleClass="button-primary" style="-fx-background-color: #2ecc71;" text="Export Detail Transaksi (CSV)">
+                        <graphic><FontIcon iconLiteral="fas-file-export" iconColor="white"/></graphic>
+                    </Button>
+                </HBox>
+
+                <TableView fx:id="tableLaporan" VBox.vgrow="ALWAYS">
+                    <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
+                    <columns>
+                        <TableColumn fx:id="colTanggal" prefWidth="130" text="Tanggal" />
+                        <TableColumn fx:id="colId" prefWidth="110" text="ID Transaksi" />
+                        <TableColumn fx:id="colItems" prefWidth="300" text="Items" />
+                        <TableColumn fx:id="colTotal" prefWidth="130" text="Total" />
+                    </columns>
+                </TableView>
+            </VBox>
+        </Tab>
+
+    </TabPane>
 </VBox>

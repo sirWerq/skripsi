@@ -6,8 +6,8 @@ Aplikasi manajemen toko dan kasir untuk UMKM Warung Haryati dengan fitur analisi
 Aplikasi ini memungkinkan pemilik warung untuk:
 - Mengelola data master produk (harga beli, harga jual).
 - Mencatat transaksi penjualan harian.
-- Melihat laporan riwayat transaksi.
-- Melakukan analisis transaksi dengan algoritma **FP-Growth** untuk menemukan pola pembelian pelanggan (Asosiasi / *Frequent Itemsets*). Hal ini membantu dalam menentukan tata letak barang atau strategi promosi bundle.
+- Menyediakan **4 Laporan Eksekutif & Bisnis** (Laporan Laba Rugi, Barang Terlaris, Analisis FP-Growth, dan Riwayat Transaksi).
+- Melakukan analisis transaksi dengan algoritma **FP-Growth** untuk menemukan pola pembelian pelanggan (Asosiasi / *Frequent Itemsets*) serta memberikan **Rekomendasi Strategi Bisnis otomatis** (seperti strategi penataan rak dan bundling produk).
 
 ## Arsitektur & Struktur Folder
 Aplikasi ini menggunakan pola desain **MVC (Model-View-Controller)** pada sisi JavaFX dan memisahkan proses analitik *Machine Learning* / *Data Mining* menggunakan Python.
@@ -131,9 +131,12 @@ Cari file `src/main/java/com/warung/haryati/App.java`, klik kanan pada file ters
 2. **Dashboard**: Menampilkan ringkasan total penjualan, total laba, jumlah produk, dan jumlah transaksi.
 3. **Data Produk**: Masuk ke menu "Produk" untuk menambah, mengedit, atau menghapus daftar barang warung.
 4. **Transaksi**: Masuk ke menu "Transaksi" untuk mencatat penjualan baru. Masukkan produk dan jumlah, lalu sistem otomatis menghitung subtotal.
-5. **Riwayat**: Untuk melihat kembali nota / struk yang sudah tersimpan.
-6. **Analisa (FP-Growth)**:
-   - Masuk ke menu "Analisa".
-   - Tentukan parameter *Minimum Support* dan *Minimum Confidence*.
-   - Klik proses, aplikasi akan memanggil script Python secara *background process*.
-   - Hasil *Frequent Itemsets* (barang yang sering dibeli bersamaan) akan muncul dalam bentuk tabel untuk membantu Anda mengambil keputusan bisnis.
+5. **Laporan & Analisis Bisnis (4 Laporan Utama)**:
+   - Masuk ke menu "Laporan" untuk mengakses 4 tab laporan eksekutif warung:
+     - **Laba Rugi & Omset**: Menampilkan rincian transaksi, omset kotor, modal (HPP), dan laba bersih warung per hari.
+     - **Barang Terlaris**: Menampilkan peringkat produk dari yang paling laris hingga kurang laris berdasarkan kuantitas dan sumbangan keuntungan.
+     - **Analisis FP-Growth**: Menampilkan hasil association rule mining beserta **💡 Rekomendasi Strategi Bisnis otomatis** (misalnya saran bundling atau peletakan rak barang yang berdekatan).
+     - **Riwayat Transaksi**: Menampilkan daftar nota / struk penjualan harian.
+   - Semua laporan dilengkapi dengan fitur **Export ke CSV/Excel** untuk kemudahan pencetakan dan pelaporan skripsi.
+6. **Analisa (FP-Growth) Eksploratif**:
+   - Masuk ke menu "Analisa" untuk melakukan eksperimen parameter *Minimum Support* dan *Minimum Confidence* secara interaktif.

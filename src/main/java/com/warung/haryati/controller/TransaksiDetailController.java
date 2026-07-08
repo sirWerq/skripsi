@@ -54,7 +54,7 @@ public class TransaksiDetailController {
 
     public void setData(Transaksi t) {
         txtId.setText("#" + t.getId());
-        txtTanggal.setText(t.getTanggal().toString());
+        txtTanggal.setText(com.warung.haryati.util.DateUtil.formatLong(t.getTanggal()));
         txtTotal.setText(CurrencyUtil.format(t.getTotal()));
         
         try {

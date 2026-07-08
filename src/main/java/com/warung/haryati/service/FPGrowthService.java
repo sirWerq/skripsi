@@ -26,10 +26,8 @@ public class FPGrowthService {
             String.valueOf(minConfidence)
         );
         
-        // Jangan gabungkan stream agar stdout bersih (hanya JSON)
         Process process = pb.start();
         
-        // Baca stdout (Hasil JSON)
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         StringBuilder output = new StringBuilder();
         String line;
@@ -37,7 +35,6 @@ public class FPGrowthService {
             output.append(line);
         }
         
-        // Baca stderr (Untuk menangkap log/progress python)
         BufferedReader errReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
         StringBuilder errorOutput = new StringBuilder();
         while ((line = errReader.readLine()) != null) {
