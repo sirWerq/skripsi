@@ -33,7 +33,7 @@
             
             <VBox spacing="8">
                 <Label text="Minimum Confidence (0.01 - 1.0)" style="-fx-font-weight: bold;"/>
-                <TextField fx:id="txtMinConfidence" text="0.5" prefWidth="150" promptText="Contoh: 0.5"/>
+                <TextField fx:id="txtMinConfidence" text="0.6" prefWidth="150" promptText="Contoh: 0.6"/>
             </VBox>
             
             <Button onAction="#handleAnalyze" styleClass="button-primary" text="Jalankan Analisis">

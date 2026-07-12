@@ -73,7 +73,7 @@
                 </GridPane>
 
                 <HBox alignment="CENTER_RIGHT">
-                    <Button onAction="#handleExportLabaRugi" styleClass="button-primary" style="-fx-background-color: #2ecc71;" text="Export Laba Rugi (CSV)">
+                    <Button onAction="#handleExportLabaRugi" styleClass="button-primary" style="-fx-background-color: #2ecc71;" text="Export Laba Rugi (Excel)">
                         <graphic><FontIcon iconLiteral="fas-file-excel" iconColor="white"/></graphic>
                     </Button>
                 </HBox>
@@ -102,7 +102,7 @@
                         <Text style="-fx-font-size: 12px; -fx-fill: #7f8c8d;" text="Menampilkan produk terlaris berdasarkan kuantitas terjual dan sumbangan laba." />
                     </VBox>
                     <Region HBox.hgrow="ALWAYS" />
-                    <Button onAction="#handleExportBarangTerlaris" styleClass="button-primary" style="-fx-background-color: #2ecc71;" text="Export Barang Terlaris (CSV)">
+                    <Button onAction="#handleExportBarangTerlaris" styleClass="button-primary" style="-fx-background-color: #2ecc71;" text="Export Barang Terlaris (Excel)">
                         <graphic><FontIcon iconLiteral="fas-file-excel" iconColor="white"/></graphic>
                     </Button>
                 </HBox>
@@ -126,9 +126,8 @@
                 <padding><Insets top="15" left="5" right="5" bottom="5" /></padding>
                 
                 <HBox alignment="CENTER_RIGHT" spacing="15" style="-fx-background-color: #f1f3f9; -fx-background-radius: 10; -fx-padding: 12;">
-                    <ProgressIndicator fx:id="laporanLoadingIndicator" prefWidth="25" prefHeight="25" visible="false" />
                     <Region HBox.hgrow="ALWAYS" />
-                    <Button onAction="#handleExportFpGrowth" styleClass="button-primary" style="-fx-background-color: #2ecc71;" text="Export Laporan FP-Growth (CSV)">
+                    <Button onAction="#handleExportFpGrowth" styleClass="button-primary" style="-fx-background-color: #2ecc71;" text="Export Laporan FP-Growth (Excel)">
                         <graphic><FontIcon iconLiteral="fas-file-export" iconColor="white"/></graphic>
                     </Button>
                 </HBox>
@@ -170,7 +169,7 @@
                 </GridPane>
 
                 <HBox alignment="CENTER_RIGHT">
-                    <Button onAction="#handleExport" styleClass="button-primary" style="-fx-background-color: #2ecc71;" text="Export Detail Transaksi (CSV)">
+                    <Button onAction="#handleExport" styleClass="button-primary" style="-fx-background-color: #2ecc71;" text="Export Detail Transaksi (Excel)">
                         <graphic><FontIcon iconLiteral="fas-file-export" iconColor="white"/></graphic>
                     </Button>
                 </HBox>

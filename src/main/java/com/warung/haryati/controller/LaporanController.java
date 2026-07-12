@@ -4,6 +4,7 @@ import com.warung.haryati.model.AnalisisResult;
 import com.warung.haryati.service.FPGrowthService;
 import com.warung.haryati.util.CurrencyUtil;
 import com.warung.haryati.util.DBConnection;
+import com.warung.haryati.util.ExcelReportUtil;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -17,7 +18,6 @@ import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.*;
 import java.time.LocalDate;
@@ -39,11 +39,9 @@ public class LaporanController {
     private ObservableList<BarangTerlarisRow> barangTerlarisData = FXCollections.observableArrayList();
 
     // TAB 3: Analisis FP-Growth
-    @FXML private ProgressIndicator laporanLoadingIndicator;
     @FXML private TableView<FpGrowthReportRow> tableFpGrowthReport;
     @FXML private TableColumn<FpGrowthReportRow, String> colRuleAntecedents, colRuleConsequents, colRuleSupport, colRuleConfidence, colRuleLift, colRuleRekomendasi;
     private ObservableList<FpGrowthReportRow> fpGrowthReportData = FXCollections.observableArrayList();
-    private final FPGrowthService analysisService = new FPGrowthService();
 
     // TAB 4: Riwayat & Detail Transaksi
     @FXML private Text txtTotalTransaksi, txtTotalPendapatan;
@@ -57,9 +55,15 @@ public class LaporanController {
         setupTables();
         setDefaultDateRange();
         loadAllReports();
+        checkAndLoadExistingFpGrowthResult();
         
-        // Load FP-Growth report automatically in background
-        handleAnalyzeFpGrowth();
+        if (tabPaneLaporan != null) {
+            tabPaneLaporan.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
+                if (newTab != null && "🧠 Analisis FP-Growth".equals(newTab.getText())) {
+                    checkAndLoadExistingFpGrowthResult();
+                }
+            });
+        }
     }
 
     private void setupDatePickers() {
@@ -152,17 +156,16 @@ public class LaporanController {
     }
 
     private LocalDate parseFlexibleDate(String text) {
+        if (text == null || text.trim().isEmpty()) return null;
+        String clean = text.trim();
         try {
-            if (dpStart != null && dpStart.getConverter() != null) {
-                LocalDate res = dpStart.getConverter().fromString(text);
-                if (res != null) return res;
-            }
+            return LocalDate.parse(clean, com.warung.haryati.util.DateUtil.FORMAT_SHORT);
         } catch (Exception ignored) {}
         
-        String[] formats = {"yyyy-MM-dd", "dd/MM/yyyy", "M/d/yyyy", "MM/dd/yyyy", "dd-MM-yyyy", "yyyy/MM/dd"};
+        String[] formats = {"yyyy-MM-dd", "dd/MM/yyyy", "M/d/yyyy", "MM/dd/yyyy", "dd-MM-yyyy", "yyyy/MM/dd", "dd/M/yyyy", "d/M/yyyy"};
         for (String fmt : formats) {
             try {
-                return LocalDate.parse(text, java.time.format.DateTimeFormatter.ofPattern(fmt));
+                return LocalDate.parse(clean, java.time.format.DateTimeFormatter.ofPattern(fmt));
             } catch (Exception ignored) {}
         }
         return null;
@@ -171,11 +174,13 @@ public class LaporanController {
     private void loadAllReports() {
         commitDatePickers();
         System.out.println("=== FILTERING REPORT ===");
-        System.out.println("Start Date: " + dpStart.getValue());
-        System.out.println("End Date: " + dpEnd.getValue());
+        System.out.println("Start Date: " + (dpStart != null ? dpStart.getValue() : "null"));
+        System.out.println("End Date: " + (dpEnd != null ? dpEnd.getValue() : "null"));
         loadLabaRugi();
         loadBarangTerlaris();
         loadDetailTransaksi();
+        // FP-Growth TIDAK otomatis dijalankan agar tidak berat dan menunggu hasil analisis
+        checkAndLoadExistingFpGrowthResult();
     }
 
     // --- TAB 1 LOGIC ---
@@ -245,19 +250,15 @@ public class LaporanController {
         LocalDate end = dpEnd.getValue();
 
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Simpan Laporan Laba Rugi");
-        fileChooser.setInitialFileName("Laporan_Laba_Rugi_" + start + "_sd_" + end + ".csv");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+        fileChooser.setTitle("Simpan Laporan Laba Rugi (Excel)");
+        fileChooser.setInitialFileName("Laporan_Laba_Rugi_" + start + "_sd_" + end + ".xlsx");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
         
         File file = fileChooser.showSaveDialog(null);
         if (file != null) {
-            try (FileWriter writer = new FileWriter(file)) {
-                writer.write("Tanggal;Jumlah Transaksi;Omset Penjualan;Modal (HPP);Laba Bersih\n");
-                for (LabaRugiRow row : labaRugiData) {
-                    writer.write(String.format("%s;%s;%.0f;%.0f;%.0f\n",
-                        row.getTanggal(), row.getJmlTransaksiStr(), row.getOmset(), row.getModal(), row.getLaba()));
-                }
-                showAlert(Alert.AlertType.INFORMATION, "Sukses", "Laporan Laba Rugi berhasil diexport (" + labaRugiData.size() + " baris).");
+            try {
+                ExcelReportUtil.exportLabaRugi(file, labaRugiData, start, end);
+                showAlert(Alert.AlertType.INFORMATION, "Sukses", "Laporan Laba Rugi berhasil diexport ke format Excel (.xlsx) rapi (" + labaRugiData.size() + " baris).");
             } catch (IOException e) {
                 showAlert(Alert.AlertType.ERROR, "Error", "Gagal export Laporan Laba Rugi: " + e.getMessage());
                 e.printStackTrace();
@@ -319,19 +320,15 @@ public class LaporanController {
         LocalDate end = dpEnd.getValue();
 
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Simpan Laporan Barang Terlaris");
-        fileChooser.setInitialFileName("Laporan_Barang_Terlaris_" + start + "_sd_" + end + ".csv");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+        fileChooser.setTitle("Simpan Laporan Barang Terlaris (Excel)");
+        fileChooser.setInitialFileName("Laporan_Barang_Terlaris_" + start + "_sd_" + end + ".xlsx");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
         
         File file = fileChooser.showSaveDialog(null);
         if (file != null) {
-            try (FileWriter writer = new FileWriter(file)) {
-                writer.write("Peringkat;Nama Barang;Kuantitas Terjual;Total Omset;Total Laba\n");
-                for (BarangTerlarisRow row : barangTerlarisData) {
-                    writer.write(String.format("%s;\"%s\";%s;%.0f;%.0f\n",
-                        row.getRankStr(), row.getNamaBarang(), row.getJmlTerjualStr(), row.getOmset(), row.getLaba()));
-                }
-                showAlert(Alert.AlertType.INFORMATION, "Sukses", "Laporan Barang Terlaris berhasil diexport (" + barangTerlarisData.size() + " baris).");
+            try {
+                ExcelReportUtil.exportBarangTerlaris(file, barangTerlarisData, start, end);
+                showAlert(Alert.AlertType.INFORMATION, "Sukses", "Laporan Barang Terlaris berhasil diexport ke format Excel (.xlsx) rapi (" + barangTerlarisData.size() + " baris).");
             } catch (IOException e) {
                 showAlert(Alert.AlertType.ERROR, "Error", "Gagal export Laporan Barang Terlaris: " + e.getMessage());
                 e.printStackTrace();
@@ -340,50 +337,32 @@ public class LaporanController {
     }
 
     // --- TAB 3 LOGIC ---
-    private void handleAnalyzeFpGrowth() {
-        double minSup = 0.02;
-        double minConf = 0.5;
-        laporanLoadingIndicator.setVisible(true);
-        
-        new Thread(() -> {
-            try {
-                AnalisisResult result = analysisService.runAnalysis(minSup, minConf);
-                
-                Platform.runLater(() -> {
-                    laporanLoadingIndicator.setVisible(false);
-                    fpGrowthReportData.clear();
-                    if (result.getError() != null) {
-                        showAlert(Alert.AlertType.ERROR, "Error Python", result.getError());
-                    } else if (result.getAssociation_rules() != null) {
-                        for (AnalisisResult.AssociationRule rule : result.getAssociation_rules()) {
-                            String rek;
-                            if (rule.getLift() > 1.0) {
-                                rek = String.format("Bundling / dekatkan posisi produk [%s] dengan [%s] (Peluang beli bersamaan %.0f%%)",
-                                    rule.getAntecedentsString(), rule.getConsequentsString(), rule.getConfidence() * 100);
-                            } else {
-                                rek = String.format("Buat promo diskon bersyarat untuk [%s] setiap pembelian [%s]",
-                                    rule.getConsequentsString(), rule.getAntecedentsString());
-                            }
-                            fpGrowthReportData.add(new FpGrowthReportRow(
-                                rule.getAntecedentsString(),
-                                rule.getConsequentsString(),
-                                rule.getSupport(),
-                                rule.getConfidence(),
-                                rule.getLift(),
-                                rek
-                            ));
-                        }
-                        tableFpGrowthReport.setItems(fpGrowthReportData);
-                    }
-                });
-            } catch (Exception e) {
-                Platform.runLater(() -> {
-                    laporanLoadingIndicator.setVisible(false);
-                    showAlert(Alert.AlertType.ERROR, "Error", "Gagal menjalankan analisis FP-Growth: " + e.getMessage());
-                    e.printStackTrace();
-                });
+    private void checkAndLoadExistingFpGrowthResult() {
+        AnalisisResult result = FPGrowthService.getLatestResult();
+        fpGrowthReportData.clear();
+        if (result != null && result.getAssociation_rules() != null && !result.getAssociation_rules().isEmpty()) {
+            for (AnalisisResult.AssociationRule rule : result.getAssociation_rules()) {
+                String rek;
+                if (rule.getLift() > 1.0) {
+                    rek = String.format("Bundling / dekatkan posisi produk [%s] dengan [%s] (Peluang beli bersamaan %.0f%%)",
+                        rule.getAntecedentsString(), rule.getConsequentsString(), rule.getConfidence() * 100);
+                } else {
+                    rek = String.format("Buat promo diskon bersyarat untuk [%s] setiap pembelian [%s]",
+                        rule.getConsequentsString(), rule.getAntecedentsString());
+                }
+                fpGrowthReportData.add(new FpGrowthReportRow(
+                    rule.getAntecedentsString(),
+                    rule.getConsequentsString(),
+                    rule.getSupport(),
+                    rule.getConfidence(),
+                    rule.getLift(),
+                    rek
+                ));
             }
-        }).start();
+            tableFpGrowthReport.setItems(fpGrowthReportData);
+        } else {
+            tableFpGrowthReport.setPlaceholder(new Label("Belum ada laporan analisis FP-Growth.\nSilakan jalankan analisis terlebih dahulu di menu Analisis FP-Growth."));
+        }
     }
 
     @FXML
@@ -394,19 +373,16 @@ public class LaporanController {
         }
 
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Simpan Laporan Analisis FP-Growth");
-        fileChooser.setInitialFileName("Laporan_Analisis_FPGrowth_" + LocalDate.now() + ".csv");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+        fileChooser.setTitle("Simpan Laporan Analisis FP-Growth (Excel)");
+        fileChooser.setInitialFileName("Laporan_Analisis_FPGrowth_" + LocalDate.now() + ".xlsx");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
         
         File file = fileChooser.showSaveDialog(null);
         if (file != null) {
-            try (FileWriter writer = new FileWriter(file)) {
-                writer.write("Jika Membeli (Antecedents);Maka Membeli (Consequents);Support;Confidence;Lift Ratio;Rekomendasi Strategi Bisnis\n");
-                for (FpGrowthReportRow row : fpGrowthReportData) {
-                    writer.write(String.format("\"%s\";\"%s\";%.3f;%.3f;%.3f;\"%s\"\n",
-                        row.getAntecedents(), row.getConsequents(), row.getSupport(), row.getConfidence(), row.getLift(), row.getRekomendasi()));
-                }
-                showAlert(Alert.AlertType.INFORMATION, "Sukses", "Laporan Analisis FP-Growth berhasil diexport (" + fpGrowthReportData.size() + " baris).");
+            try {
+                // Khusus laporan analisis FP-Growth TIDAK USAH ADA FILTERNYA (null start & end date)
+                ExcelReportUtil.exportFpGrowth(file, fpGrowthReportData, null, null);
+                showAlert(Alert.AlertType.INFORMATION, "Sukses", "Laporan Analisis FP-Growth berhasil diexport ke format Excel (.xlsx) rapi (" + fpGrowthReportData.size() + " baris).");
             } catch (IOException e) {
                 showAlert(Alert.AlertType.ERROR, "Error", "Gagal export Laporan FP-Growth: " + e.getMessage());
                 e.printStackTrace();
@@ -473,45 +449,16 @@ public class LaporanController {
         LocalDate end = dpEnd.getValue();
 
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Simpan Laporan Detail Penjualan");
-        fileChooser.setInitialFileName("Laporan_Detail_Penjualan_" + start + "_sd_" + end + ".csv");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+        fileChooser.setTitle("Simpan Laporan Detail Penjualan (Excel)");
+        fileChooser.setInitialFileName("Laporan_Detail_Penjualan_" + start + "_sd_" + end + ".xlsx");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
         
         File file = fileChooser.showSaveDialog(null);
         if (file != null) {
-            String sql = "SELECT t.id, t.tanggal, p.nama_barang, p.harga_beli, p.harga_jual, " +
-                         "dt.kuantitas, dt.subtotal, dt.laba " +
-                         "FROM transaksi t " +
-                         "JOIN detail_transaksi dt ON t.id = dt.transaksi_id " +
-                         "JOIN produk p ON dt.produk_id = p.id " +
-                         "WHERE DATE(t.tanggal) BETWEEN ? AND ? " +
-                         "ORDER BY t.tanggal DESC, t.id ASC";
-
-            try (Connection conn = DBConnection.getConnection();
-                 PreparedStatement pstmt = conn.prepareStatement(sql);
-                 FileWriter writer = new FileWriter(file)) {
-                 
-                pstmt.setDate(1, Date.valueOf(start));
-                pstmt.setDate(2, Date.valueOf(end));
-                ResultSet rs = pstmt.executeQuery();
-                
-                writer.write("ID Transaksi;Tanggal;Nama Barang;Harga Beli;Harga Jual;Kuantitas;Subtotal;Laba\n");
-                
-                int count = 0;
-                while (rs.next()) {
-                    writer.write(String.format("%s;%s;\"%s\";%.0f;%.0f;%d;%.0f;%.0f\n", 
-                        rs.getString("id"),
-                        com.warung.haryati.util.DateUtil.formatShort(rs.getDate("tanggal")),
-                        rs.getString("nama_barang"),
-                        rs.getDouble("harga_beli"),
-                        rs.getDouble("harga_jual"),
-                        rs.getInt("kuantitas"),
-                        rs.getDouble("subtotal"),
-                        rs.getDouble("laba")));
-                    count++;
-                }
-                showAlert(Alert.AlertType.INFORMATION, "Sukses", "Laporan detail transaksi berhasil diexport (" + count + " baris).");
-            } catch (SQLException | IOException e) {
+            try {
+                ExcelReportUtil.exportDetailTransaksi(file, reportData, start, end);
+                showAlert(Alert.AlertType.INFORMATION, "Sukses", "Laporan Penjualan (Ringkasan & Rincian Item) berhasil diexport ke format Excel (.xlsx) rapi (" + reportData.size() + " transaksi).");
+            } catch (IOException e) {
                 showAlert(Alert.AlertType.ERROR, "Error", "Gagal export laporan detail: " + e.getMessage());
                 e.printStackTrace();
             }

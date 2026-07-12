@@ -36,7 +36,7 @@ def get_data_from_db():
         sys.exit(1)
 
 
-def run_fp_growth(min_support=0.1, min_confidence=0.5):
+def run_fp_growth(min_support, min_confidence):
     df = get_data_from_db()
     
     if df.empty:
@@ -61,6 +61,10 @@ def run_fp_growth(min_support=0.1, min_confidence=0.5):
     # Association Rules
     rules = association_rules(frequent_itemsets, metric="confidence", min_threshold=min_confidence)
     
+    # Eliminasi rule dengan lift <= 1.0 (hanya ambil korelasi positif untuk validitas FP-Growth)
+    if not rules.empty:
+        rules = rules[rules['lift'] > 1.0]
+    
     # Formatting output
     frequent_itemsets['itemsets'] = frequent_itemsets['itemsets'].apply(lambda x: list(x))
     
@@ -84,8 +88,8 @@ def run_fp_growth(min_support=0.1, min_confidence=0.5):
     print(json.dumps(result))
 
 if __name__ == "__main__":
-    min_sup = 0.1
-    min_conf = 0.5
+    min_sup = 0.02
+    min_conf = 0.6
     
     if len(sys.argv) > 1:
         try:

@@ -8,7 +8,12 @@ import java.io.InputStreamReader;
 
 public class FPGrowthService {
     
+    private static AnalisisResult latestResult;
     private final ObjectMapper mapper = new ObjectMapper();
+
+    public static AnalisisResult getLatestResult() {
+        return latestResult;
+    }
 
     public AnalisisResult runAnalysis(double minSupport, double minConfidence) throws Exception {
         // Gunakan path absolut untuk venv agar tidak memanggil python sistem
@@ -60,6 +65,8 @@ public class FPGrowthService {
         }
         resultJson = resultJson.substring(jsonStartIndex);
         
-        return mapper.readValue(resultJson, AnalisisResult.class);
+        AnalisisResult res = mapper.readValue(resultJson, AnalisisResult.class);
+        latestResult = res;
+        return res;
     }
 }

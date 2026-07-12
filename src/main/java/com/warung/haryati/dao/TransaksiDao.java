@@ -48,16 +48,7 @@ public class TransaksiDao {
             conn.setAutoCommit(true);
         }
     }
-    
-    public int countAll() throws SQLException {
-        String sql = "SELECT COUNT(*) FROM transaksi";
-        try (Connection conn = DBConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            if (rs.next()) return rs.getInt(1);
-        }
-        return 0;
-    }
+
 
     public List<Transaksi> getAll() throws SQLException {
         List<Transaksi> list = new ArrayList<>();
@@ -167,19 +158,5 @@ public class TransaksiDao {
         } finally {
             conn.setAutoCommit(true);
         }
-    }
-    public List<Transaksi> getByDateRange(Date start, Date end) throws SQLException {
-        List<Transaksi> list = new ArrayList<>();
-        String sql = "SELECT * FROM transaksi WHERE tanggal BETWEEN ? AND ? ORDER BY tanggal DESC";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setDate(1, start);
-            pstmt.setDate(2, end);
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                list.add(new Transaksi(rs.getString("id"), rs.getDate("tanggal")));
-            }
-        }
-        return list;
     }
 }
