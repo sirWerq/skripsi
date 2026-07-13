@@ -5,6 +5,8 @@
 <?import javafx.scene.text.Text?>
 <?import javafx.geometry.Insets?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.NumberAxis?>
@@ -18,13 +20,17 @@
             <Insets top="30" />
         </padding>
         
-        <HBox alignment="CENTER_LEFT" spacing="10">
+        <VBox alignment="CENTER" spacing="10">
             <padding>
-                <Insets left="20" bottom="30" />
+                <Insets bottom="30" left="20" right="20" />
             </padding>
-            <FontIcon iconLiteral="fas-store" iconSize="24" iconColor="white"/>
+            <ImageView fitWidth="80.0" fitHeight="80.0" preserveRatio="true">
+                <image>
+                    <Image url="@../logo.png"/>
+                </image>
+            </ImageView>
             <Text style="-fx-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;" text="Warung Haryati" />
-        </HBox>
+        </VBox>
 
         <Button fx:id="btnDashboard" onAction="#showDashboard" maxWidth="Infinity" styleClass="sidebar-button, sidebar-button-active" text="Dashboard">
             <graphic><FontIcon iconLiteral="fas-home" iconSize="16" iconColor="#adb5bd"/></graphic>

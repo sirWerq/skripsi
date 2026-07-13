@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -18,6 +19,11 @@ public class App extends Application {
         scene = new Scene(loadFXML("login"), 1000, 700);
         stage.setScene(scene);
         stage.setTitle("Warung Haryati - Analisis FP-Growth");
+        try {
+            stage.getIcons().add(new Image(App.class.getResourceAsStream("/logo.png")));
+        } catch (Exception e) {
+            System.err.println("Gagal memuat ikon aplikasi: " + e.getMessage());
+        }
         stage.setMaximized(true);
         stage.show();
     }

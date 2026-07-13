@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.IOException;
@@ -26,12 +27,33 @@ public class LoginController {
     private TextField passwordTextField;
 
     @FXML
+    private HBox passwordContainer;
+
+    @FXML
     private FontIcon eyeIcon;
 
     @FXML
     private Label errorLabel;
 
     private boolean isPasswordVisible = false;
+
+    @FXML
+    public void initialize() {
+        if (passwordContainer != null) {
+            passwordField.focusedProperty().addListener((obs, oldVal, newVal) -> updatePasswordContainerFocus(newVal || passwordTextField.isFocused()));
+            passwordTextField.focusedProperty().addListener((obs, oldVal, newVal) -> updatePasswordContainerFocus(newVal || passwordField.isFocused()));
+        }
+    }
+
+    private void updatePasswordContainerFocus(boolean isFocused) {
+        if (isFocused) {
+            if (!passwordContainer.getStyleClass().contains("password-container-focused")) {
+                passwordContainer.getStyleClass().add("password-container-focused");
+            }
+        } else {
+            passwordContainer.getStyleClass().remove("password-container-focused");
+        }
+    }
 
     @FXML
     private void togglePassword() {

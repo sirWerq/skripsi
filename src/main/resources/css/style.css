@@ -92,6 +92,56 @@
     -fx-background-color: white;
 }
 
+/* Seamless Password & Input Container */
+.password-container {
+    -fx-background-color: #f1f3f9;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: transparent;
+    -fx-border-width: 1.5;
+    -fx-padding: 0;
+    -fx-alignment: center-left;
+}
+
+.password-container-focused {
+    -fx-background-color: white;
+    -fx-border-color: #4361ee;
+}
+
+/* Inner Password Field without any separate border/background */
+.password-field-inner {
+    -fx-background-color: transparent !important;
+    -fx-border-color: transparent !important;
+    -fx-border-width: 0 !important;
+    -fx-background-insets: 0 !important;
+    -fx-padding: 10 5 10 12 !important;
+    -fx-font-size: 14px;
+    -fx-focus-color: transparent !important;
+    -fx-faint-focus-color: transparent !important;
+}
+
+/* Seamless Eye Button inside Password Container */
+.eye-button {
+    -fx-background-color: transparent !important;
+    -fx-border-color: transparent !important;
+    -fx-border-width: 0 !important;
+    -fx-background-insets: 0 !important;
+    -fx-padding: 0 14 0 10 !important;
+    -fx-cursor: hand;
+    -fx-focus-color: transparent !important;
+    -fx-faint-focus-color: transparent !important;
+}
+
+.eye-button:hover {
+    -fx-background-color: transparent !important;
+    -fx-opacity: 0.7;
+}
+
+.eye-button:pressed {
+    -fx-background-color: transparent !important;
+    -fx-opacity: 0.5;
+}
+
 /* Table Enhancements */
 .table-view {
     -fx-background-color: white;
