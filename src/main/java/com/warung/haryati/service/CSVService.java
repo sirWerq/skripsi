@@ -38,7 +38,6 @@ public class CSVService {
                     break;
                 }
             } catch (Exception e) {
-                // Try next separator
             }
         }
 
@@ -46,7 +45,6 @@ public class CSVService {
             throw new IOException("Gagal mendeteksi format CSV. Pastikan terdapat kolom 'ID Transaksi'.");
         }
         
-        // Group by Transaction ID
         Map<String, List<Map<String, String>>> groupedTransactions = new LinkedHashMap<>();
         for (Map<String, String> row : allRows) {
             String tId = row.get("ID Transaksi");
@@ -63,14 +61,12 @@ public class CSVService {
             if (tanggalStr == null || tanggalStr.trim().isEmpty()) continue;
             
             Transaksi t = new Transaksi();
-            t.setId(entry.getKey()); // Menggunakan ID dari CSV
+            t.setId(entry.getKey());
             try {
                 String cleanTgl = tanggalStr.trim();
-                // Deteksi format DD/MM/YYYY (Indonesian format)
                 if (cleanTgl.contains("/")) {
                     String[] parts = cleanTgl.split("/");
                     if (parts.length == 3) {
-                        // Jika tahun ada di depan (YYYY/MM/DD), biarkan. Jika di belakang, balik.
                         if (parts[2].length() == 4) {
                             cleanTgl = parts[2] + "-" + parts[1] + "-" + parts[0];
                         } else if (parts[0].length() == 4) {
@@ -95,7 +91,6 @@ public class CSVService {
                 double subtotal = Double.parseDouble(row.get("Subtotal"));
                 double laba = Double.parseDouble(row.get("Laba"));
                 
-                // Get or Create Product
                 Produk p = produkDao.getByNama(namaBarang);
                 if (p == null) {
                     p = new Produk();

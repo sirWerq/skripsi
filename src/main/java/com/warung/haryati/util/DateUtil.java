@@ -7,10 +7,7 @@ import java.util.Locale;
 public class DateUtil {
     public static final Locale LOCALE_ID = new Locale("id", "ID");
     
-    // Format standar untuk tabel & UI: dd-MM-yyyy (misal: 01-12-2025)
     public static final DateTimeFormatter FORMAT_SHORT = DateTimeFormatter.ofPattern("dd-MM-yyyy", LOCALE_ID);
-    
-    // Format panjang dengan nama bulan Indonesia: dd MMMM yyyy (misal: 01 Desember 2025)
     public static final DateTimeFormatter FORMAT_LONG = DateTimeFormatter.ofPattern("dd MMMM yyyy", LOCALE_ID);
 
     public static String formatShort(LocalDate date) {

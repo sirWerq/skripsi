@@ -12,7 +12,6 @@
         <Insets top="20" left="20" right="20" bottom="20" />
     </padding>
 
-    <!-- Header & Filter Bar -->
     <HBox alignment="CENTER_LEFT" spacing="20">
         <VBox>
             <Text style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-fill: #2c3e50;" text="Laporan &amp; Analisis Bisnis" />
@@ -38,10 +37,7 @@
         </HBox>
     </HBox>
 
-    <!-- TabPane 4 Laporan -->
     <TabPane fx:id="tabPaneLaporan" VBox.vgrow="ALWAYS" tabClosingPolicy="UNAVAILABLE" styleClass="card" style="-fx-padding: 10;">
-        
-        <!-- TAB 1: LAPORAN PENJUALAN & LABA RUGI -->
         <Tab text="📊 Laba Rugi &amp; Omset">
             <VBox spacing="15">
                 <padding><Insets top="15" left="5" right="5" bottom="5" /></padding>
@@ -73,8 +69,8 @@
                 </GridPane>
 
                 <HBox alignment="CENTER_RIGHT">
-                    <Button onAction="#handleExportLabaRugi" styleClass="button-primary" style="-fx-background-color: #2ecc71;" text="Export Laba Rugi (Excel)">
-                        <graphic><FontIcon iconLiteral="fas-file-excel" iconColor="white"/></graphic>
+                    <Button onAction="#handleExportLabaRugi" styleClass="button-primary" style="-fx-background-color: #e74c3c;" text="Export Laba Rugi (PDF)">
+                        <graphic><FontIcon iconLiteral="fas-file-pdf" iconColor="white"/></graphic>
                     </Button>
                 </HBox>
 
@@ -91,7 +87,6 @@
             </VBox>
         </Tab>
 
-        <!-- TAB 2: LAPORAN BARANG TERLARIS -->
         <Tab text="🏆 Barang Terlaris">
             <VBox spacing="15">
                 <padding><Insets top="15" left="5" right="5" bottom="5" /></padding>
@@ -102,8 +97,8 @@
                         <Text style="-fx-font-size: 12px; -fx-fill: #7f8c8d;" text="Menampilkan produk terlaris berdasarkan kuantitas terjual dan sumbangan laba." />
                     </VBox>
                     <Region HBox.hgrow="ALWAYS" />
-                    <Button onAction="#handleExportBarangTerlaris" styleClass="button-primary" style="-fx-background-color: #2ecc71;" text="Export Barang Terlaris (Excel)">
-                        <graphic><FontIcon iconLiteral="fas-file-excel" iconColor="white"/></graphic>
+                    <Button onAction="#handleExportBarangTerlaris" styleClass="button-primary" style="-fx-background-color: #e74c3c;" text="Export Barang Terlaris (PDF)">
+                        <graphic><FontIcon iconLiteral="fas-file-pdf" iconColor="white"/></graphic>
                     </Button>
                 </HBox>
 
@@ -120,15 +115,14 @@
             </VBox>
         </Tab>
 
-        <!-- TAB 3: LAPORAN ANALISIS FP-GROWTH -->
         <Tab text="🧠 Analisis FP-Growth">
             <VBox spacing="15">
                 <padding><Insets top="15" left="5" right="5" bottom="5" /></padding>
                 
                 <HBox alignment="CENTER_RIGHT" spacing="15" style="-fx-background-color: #f1f3f9; -fx-background-radius: 10; -fx-padding: 12;">
                     <Region HBox.hgrow="ALWAYS" />
-                    <Button onAction="#handleExportFpGrowth" styleClass="button-primary" style="-fx-background-color: #2ecc71;" text="Export Laporan FP-Growth (Excel)">
-                        <graphic><FontIcon iconLiteral="fas-file-export" iconColor="white"/></graphic>
+                    <Button onAction="#handleExportFpGrowth" styleClass="button-primary" style="-fx-background-color: #e74c3c;" text="Export Laporan FP-Growth (PDF)">
+                        <graphic><FontIcon iconLiteral="fas-file-pdf" iconColor="white"/></graphic>
                     </Button>
                 </HBox>
 
@@ -146,7 +140,6 @@
             </VBox>
         </Tab>
 
-        <!-- TAB 4: RIWAYAT & DETAIL TRANSAKSI -->
         <Tab text="📝 Riwayat Transaksi">
             <VBox spacing="15">
                 <padding><Insets top="15" left="5" right="5" bottom="5" /></padding>
@@ -169,8 +162,8 @@
                 </GridPane>
 
                 <HBox alignment="CENTER_RIGHT">
-                    <Button onAction="#handleExport" styleClass="button-primary" style="-fx-background-color: #2ecc71;" text="Export Detail Transaksi (Excel)">
-                        <graphic><FontIcon iconLiteral="fas-file-export" iconColor="white"/></graphic>
+                    <Button onAction="#handleExport" styleClass="button-primary" style="-fx-background-color: #e74c3c;" text="Export Detail Transaksi (PDF)">
+                        <graphic><FontIcon iconLiteral="fas-file-pdf" iconColor="white"/></graphic>
                     </Button>
                 </HBox>
 

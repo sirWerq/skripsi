@@ -18,14 +18,12 @@ public class TransaksiDao {
 
             if (t.getId() == null) t.setId(IDGenerator.generate("TRX"));
 
-            // Insert Transaksi
             String sqlT = "INSERT INTO transaksi (id, tanggal) VALUES (?, ?)";
             PreparedStatement pstmtT = conn.prepareStatement(sqlT);
             pstmtT.setString(1, t.getId());
             pstmtT.setDate(2, t.getTanggal());
             pstmtT.executeUpdate();
 
-            // Insert Details
             String sqlD = "INSERT INTO detail_transaksi (id, transaksi_id, produk_id, kuantitas, subtotal, laba) VALUES (?, ?, ?, ?, ?, ?)";
             PreparedStatement pstmtD = conn.prepareStatement(sqlD);
             for (DetailTransaksi d : details) {
@@ -123,20 +121,17 @@ public class TransaksiDao {
         try {
             conn.setAutoCommit(false);
             
-            // Delete old details
             String sqlD = "DELETE FROM detail_transaksi WHERE transaksi_id = ?";
             PreparedStatement pstmtD = conn.prepareStatement(sqlD);
             pstmtD.setString(1, t.getId());
             pstmtD.executeUpdate();
             
-            // Update transaction date
             String sqlT = "UPDATE transaksi SET tanggal = ? WHERE id = ?";
             PreparedStatement pstmtT = conn.prepareStatement(sqlT);
             pstmtT.setDate(1, t.getTanggal());
             pstmtT.setString(2, t.getId());
             pstmtT.executeUpdate();
             
-            // Insert new details
             String sqlDI = "INSERT INTO detail_transaksi (id, transaksi_id, produk_id, kuantitas, subtotal, laba) VALUES (?, ?, ?, ?, ?, ?)";
             PreparedStatement pstmtDI = conn.prepareStatement(sqlDI);
             for (DetailTransaksi d : details) {

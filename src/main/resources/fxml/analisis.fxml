@@ -21,7 +21,6 @@
         <Region HBox.hgrow="ALWAYS" />
     </HBox>
 
-    <!-- Configuration Card -->
     <VBox styleClass="card" spacing="20">
         <Text style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Konfigurasi Parameter" />
         

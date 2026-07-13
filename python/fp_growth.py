@@ -3,7 +3,6 @@ import sys
 import json
 import warnings
 
-# Suppress all warnings sedini mungkin
 warnings.filterwarnings("ignore")
 os.environ['PYTHONWARNINGS'] = 'ignore'
 
@@ -43,42 +42,34 @@ def run_fp_growth(min_support, min_confidence):
         print(json.dumps({"frequent_itemsets": [], "association_rules": []}))
         return
 
-    # Group items by transaction_id
     transactions = df.groupby('transaction_id')['nama_barang'].apply(list).values.tolist()
     
-    # One-hot encoding
     te = TransactionEncoder()
     te_ary = te.fit(transactions).transform(transactions)
     df_encoded = pd.DataFrame(te_ary, columns=te.columns_)
     
-    # Frequent Itemsets
     frequent_itemsets = fpgrowth(df_encoded, min_support=min_support, use_colnames=True)
     
     if frequent_itemsets.empty:
         print(json.dumps({"frequent_itemsets": [], "association_rules": []}))
         return
 
-    # Association Rules
     rules = association_rules(frequent_itemsets, metric="confidence", min_threshold=min_confidence)
     
-    # Eliminasi rule dengan lift <= 1.0 (hanya ambil korelasi positif untuk validitas FP-Growth)
     if not rules.empty:
         rules = rules[rules['lift'] > 1.0]
     
-    # Formatting output
-    frequent_itemsets['itemsets'] = frequent_itemsets['itemsets'].apply(lambda x: list(x))
+    frequent_itemsets['itemsets'] = frequent_itemsets['itemsets'].apply(list)
     
-    # Convert rules to list of dicts
     rules_list = []
-    if not rules.empty:
-        for idx, row in rules.iterrows():
-            rules_list.append({
-                "antecedents": list(row['antecedents']),
-                "consequents": list(row['consequents']),
-                "support": float(row['support']),
-                "confidence": float(row['confidence']),
-                "lift": float(row['lift'])
-            })
+    for _, row in rules.iterrows():
+        rules_list.append({
+            "antecedents": list(row['antecedents']),
+            "consequents": list(row['consequents']),
+            "support": float(row['support']),
+            "confidence": float(row['confidence']),
+            "lift": float(row['lift'])
+        })
             
     result = {
         "frequent_itemsets": frequent_itemsets.to_dict(orient='records'),

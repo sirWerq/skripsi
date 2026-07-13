@@ -20,7 +20,7 @@ public class App extends Application {
         stage.setScene(scene);
         stage.setTitle("Warung Haryati - Analisis FP-Growth");
         try {
-            stage.getIcons().add(new Image(App.class.getResourceAsStream("/logo.png")));
+            stage.getIcons().add(new Image(App.class.getResourceAsStream("/images/logo.png")));
         } catch (Exception e) {
             System.err.println("Gagal memuat ikon aplikasi: " + e.getMessage());
         }

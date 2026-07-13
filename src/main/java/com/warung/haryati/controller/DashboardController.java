@@ -49,11 +49,9 @@ public class DashboardController {
         try (Connection conn = DBConnection.getConnection();
              Statement stmt = conn.createStatement()) {
             
-            // Total Transaksi
             ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM transaksi");
             if (rs.next()) txtTotalTransaksi.setText(String.valueOf(rs.getInt(1)));
             
-            // Total Produk
             rs = stmt.executeQuery("SELECT COUNT(*) FROM produk");
             if (rs.next()) txtTotalProduk.setText(String.valueOf(rs.getInt(1)));
             

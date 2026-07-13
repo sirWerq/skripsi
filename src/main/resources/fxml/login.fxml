@@ -14,7 +14,7 @@
     <VBox alignment="CENTER" spacing="15.0" styleClass="card" maxWidth="400">
         <ImageView fitWidth="100.0" fitHeight="100.0" preserveRatio="true">
             <image>
-                <Image url="@../logo.png"/>
+                <Image url="@../images/logo.png"/>
             </image>
         </ImageView>
         <VBox alignment="CENTER" spacing="5.0">

@@ -50,7 +50,6 @@ public class ProdukFormController {
 
             if (hargaJual < hargaBeli) {
                 showAlert("Peringatan", "Harga jual lebih kecil dari harga beli. Lanjutkan?");
-                // Note: For simplicity, we just warn or block. Let's block for now as validation.
             }
 
             if (currentProduk == null) {

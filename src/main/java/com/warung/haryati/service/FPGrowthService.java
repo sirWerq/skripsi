@@ -16,7 +16,6 @@ public class FPGrowthService {
     }
 
     public AnalisisResult runAnalysis(double minSupport, double minConfidence) throws Exception {
-        // Gunakan path absolut untuk venv agar tidak memanggil python sistem
         File venvPython = new File("python/venv/Scripts/python.exe");
         File scriptFile = new File("python/fp_growth.py");
 
@@ -44,7 +43,7 @@ public class FPGrowthService {
         StringBuilder errorOutput = new StringBuilder();
         while ((line = errReader.readLine()) != null) {
             errorOutput.append(line).append("\n");
-            System.out.println("Python Log: " + line); // Cetak langsung ke terminal Java
+            System.out.println("Python Log: " + line);
         }
         
         int exitCode = process.waitFor();
@@ -58,7 +57,6 @@ public class FPGrowthService {
             throw new Exception("Python tidak memberikan hasil. Error:\n" + errorOutput.toString());
         }
 
-        // Cari posisi kurung kurawal pertama '{' untuk membuang Warning teks di depannya
         int jsonStartIndex = resultJson.indexOf("{");
         if (jsonStartIndex == -1) {
             throw new Exception("Format output Python tidak valid (Bukan JSON). Output:\n" + resultJson);

@@ -4,7 +4,8 @@ import com.warung.haryati.model.AnalisisResult;
 import com.warung.haryati.service.FPGrowthService;
 import com.warung.haryati.util.CurrencyUtil;
 import com.warung.haryati.util.DBConnection;
-import com.warung.haryati.util.ExcelReportUtil;
+import com.warung.haryati.util.PdfReportUtil;
+import com.itextpdf.text.DocumentException;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -27,23 +28,19 @@ public class LaporanController {
     @FXML private DatePicker dpStart, dpEnd;
     @FXML private TabPane tabPaneLaporan;
 
-    // TAB 1: Laba Rugi
     @FXML private Text txtTotalTransaksiLaba, txtTotalOmsetLaba, txtTotalModalLaba, txtTotalLabaBersih;
     @FXML private TableView<LabaRugiRow> tableLabaRugi;
     @FXML private TableColumn<LabaRugiRow, String> colLabaTanggal, colLabaJmlTransaksi, colLabaOmset, colLabaModal, colLabaBersih;
     private ObservableList<LabaRugiRow> labaRugiData = FXCollections.observableArrayList();
 
-    // TAB 2: Barang Terlaris
     @FXML private TableView<BarangTerlarisRow> tableBarangTerlaris;
     @FXML private TableColumn<BarangTerlarisRow, String> colRank, colNamaBarang, colJmlTerjual, colOmsetBarang, colLabaBarang;
     private ObservableList<BarangTerlarisRow> barangTerlarisData = FXCollections.observableArrayList();
 
-    // TAB 3: Analisis FP-Growth
     @FXML private TableView<FpGrowthReportRow> tableFpGrowthReport;
     @FXML private TableColumn<FpGrowthReportRow, String> colRuleAntecedents, colRuleConsequents, colRuleSupport, colRuleConfidence, colRuleLift, colRuleRekomendasi;
     private ObservableList<FpGrowthReportRow> fpGrowthReportData = FXCollections.observableArrayList();
 
-    // TAB 4: Riwayat & Detail Transaksi
     @FXML private Text txtTotalTransaksi, txtTotalPendapatan;
     @FXML private TableView<LaporanRow> tableLaporan;
     @FXML private TableColumn<LaporanRow, String> colTanggal, colId, colItems, colTotal;
@@ -100,21 +97,18 @@ public class LaporanController {
     }
 
     private void setupTables() {
-        // Tab 1
         colLabaTanggal.setCellValueFactory(new PropertyValueFactory<>("tanggal"));
         colLabaJmlTransaksi.setCellValueFactory(new PropertyValueFactory<>("jmlTransaksiStr"));
         colLabaOmset.setCellValueFactory(new PropertyValueFactory<>("omsetStr"));
         colLabaModal.setCellValueFactory(new PropertyValueFactory<>("modalStr"));
         colLabaBersih.setCellValueFactory(new PropertyValueFactory<>("labaStr"));
 
-        // Tab 2
         colRank.setCellValueFactory(new PropertyValueFactory<>("rankStr"));
         colNamaBarang.setCellValueFactory(new PropertyValueFactory<>("namaBarang"));
         colJmlTerjual.setCellValueFactory(new PropertyValueFactory<>("jmlTerjualStr"));
         colOmsetBarang.setCellValueFactory(new PropertyValueFactory<>("omsetStr"));
         colLabaBarang.setCellValueFactory(new PropertyValueFactory<>("labaStr"));
 
-        // Tab 3
         colRuleAntecedents.setCellValueFactory(new PropertyValueFactory<>("antecedents"));
         colRuleConsequents.setCellValueFactory(new PropertyValueFactory<>("consequents"));
         colRuleSupport.setCellValueFactory(new PropertyValueFactory<>("supportStr"));
@@ -122,7 +116,6 @@ public class LaporanController {
         colRuleLift.setCellValueFactory(new PropertyValueFactory<>("liftStr"));
         colRuleRekomendasi.setCellValueFactory(new PropertyValueFactory<>("rekomendasi"));
 
-        // Tab 4
         colTanggal.setCellValueFactory(new PropertyValueFactory<>("tanggal"));
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colItems.setCellValueFactory(new PropertyValueFactory<>("items"));
@@ -179,11 +172,9 @@ public class LaporanController {
         loadLabaRugi();
         loadBarangTerlaris();
         loadDetailTransaksi();
-        // FP-Growth TIDAK otomatis dijalankan agar tidak berat dan menunggu hasil analisis
         checkAndLoadExistingFpGrowthResult();
     }
 
-    // --- TAB 1 LOGIC ---
     private void loadLabaRugi() {
         labaRugiData.clear();
         int totalTx = 0;
@@ -250,23 +241,22 @@ public class LaporanController {
         LocalDate end = dpEnd.getValue();
 
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Simpan Laporan Laba Rugi (Excel)");
-        fileChooser.setInitialFileName("Laporan_Laba_Rugi_" + start + "_sd_" + end + ".xlsx");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
+        fileChooser.setTitle("Simpan Laporan Laba Rugi (PDF)");
+        fileChooser.setInitialFileName("Laporan_Laba_Rugi_" + start + "_sd_" + end + ".pdf");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files (*.pdf)", "*.pdf"));
         
         File file = fileChooser.showSaveDialog(null);
         if (file != null) {
             try {
-                ExcelReportUtil.exportLabaRugi(file, labaRugiData, start, end);
-                showAlert(Alert.AlertType.INFORMATION, "Sukses", "Laporan Laba Rugi berhasil diexport ke format Excel (.xlsx) rapi (" + labaRugiData.size() + " baris).");
-            } catch (IOException e) {
+                PdfReportUtil.exportLabaRugi(file, labaRugiData, start, end);
+                showAlert(Alert.AlertType.INFORMATION, "Sukses", "Laporan Laba Rugi berhasil diexport ke format PDF dengan KOP Surat dan Tanda Tangan rapi (" + labaRugiData.size() + " baris).");
+            } catch (Exception e) {
                 showAlert(Alert.AlertType.ERROR, "Error", "Gagal export Laporan Laba Rugi: " + e.getMessage());
                 e.printStackTrace();
             }
         }
     }
 
-    // --- TAB 2 LOGIC ---
     private void loadBarangTerlaris() {
         barangTerlarisData.clear();
         LocalDate start = dpStart.getValue();
@@ -320,23 +310,22 @@ public class LaporanController {
         LocalDate end = dpEnd.getValue();
 
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Simpan Laporan Barang Terlaris (Excel)");
-        fileChooser.setInitialFileName("Laporan_Barang_Terlaris_" + start + "_sd_" + end + ".xlsx");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
+        fileChooser.setTitle("Simpan Laporan Barang Terlaris (PDF)");
+        fileChooser.setInitialFileName("Laporan_Barang_Terlaris_" + start + "_sd_" + end + ".pdf");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files (*.pdf)", "*.pdf"));
         
         File file = fileChooser.showSaveDialog(null);
         if (file != null) {
             try {
-                ExcelReportUtil.exportBarangTerlaris(file, barangTerlarisData, start, end);
-                showAlert(Alert.AlertType.INFORMATION, "Sukses", "Laporan Barang Terlaris berhasil diexport ke format Excel (.xlsx) rapi (" + barangTerlarisData.size() + " baris).");
-            } catch (IOException e) {
+                PdfReportUtil.exportBarangTerlaris(file, barangTerlarisData, start, end);
+                showAlert(Alert.AlertType.INFORMATION, "Sukses", "Laporan Barang Terlaris berhasil diexport ke format PDF dengan KOP Surat dan Tanda Tangan rapi (" + barangTerlarisData.size() + " baris).");
+            } catch (Exception e) {
                 showAlert(Alert.AlertType.ERROR, "Error", "Gagal export Laporan Barang Terlaris: " + e.getMessage());
                 e.printStackTrace();
             }
         }
     }
 
-    // --- TAB 3 LOGIC ---
     private void checkAndLoadExistingFpGrowthResult() {
         AnalisisResult result = FPGrowthService.getLatestResult();
         fpGrowthReportData.clear();
@@ -373,24 +362,22 @@ public class LaporanController {
         }
 
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Simpan Laporan Analisis FP-Growth (Excel)");
-        fileChooser.setInitialFileName("Laporan_Analisis_FPGrowth_" + LocalDate.now() + ".xlsx");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
+        fileChooser.setTitle("Simpan Laporan Analisis FP-Growth (PDF)");
+        fileChooser.setInitialFileName("Laporan_Analisis_FPGrowth_" + LocalDate.now() + ".pdf");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files (*.pdf)", "*.pdf"));
         
         File file = fileChooser.showSaveDialog(null);
         if (file != null) {
             try {
-                // Khusus laporan analisis FP-Growth TIDAK USAH ADA FILTERNYA (null start & end date)
-                ExcelReportUtil.exportFpGrowth(file, fpGrowthReportData, null, null);
-                showAlert(Alert.AlertType.INFORMATION, "Sukses", "Laporan Analisis FP-Growth berhasil diexport ke format Excel (.xlsx) rapi (" + fpGrowthReportData.size() + " baris).");
-            } catch (IOException e) {
+                PdfReportUtil.exportFpGrowth(file, fpGrowthReportData, null, null);
+                showAlert(Alert.AlertType.INFORMATION, "Sukses", "Laporan Analisis FP-Growth berhasil diexport ke format PDF dengan KOP Surat dan Tanda Tangan rapi (" + fpGrowthReportData.size() + " baris).");
+            } catch (Exception e) {
                 showAlert(Alert.AlertType.ERROR, "Error", "Gagal export Laporan FP-Growth: " + e.getMessage());
                 e.printStackTrace();
             }
         }
     }
 
-    // --- TAB 4 LOGIC ---
     private void loadDetailTransaksi() {
         reportData.clear();
         double grandTotal = 0;
@@ -449,16 +436,16 @@ public class LaporanController {
         LocalDate end = dpEnd.getValue();
 
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Simpan Laporan Detail Penjualan (Excel)");
-        fileChooser.setInitialFileName("Laporan_Detail_Penjualan_" + start + "_sd_" + end + ".xlsx");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
+        fileChooser.setTitle("Simpan Laporan Detail Penjualan (PDF)");
+        fileChooser.setInitialFileName("Laporan_Detail_Penjualan_" + start + "_sd_" + end + ".pdf");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files (*.pdf)", "*.pdf"));
         
         File file = fileChooser.showSaveDialog(null);
         if (file != null) {
             try {
-                ExcelReportUtil.exportDetailTransaksi(file, reportData, start, end);
-                showAlert(Alert.AlertType.INFORMATION, "Sukses", "Laporan Penjualan (Ringkasan & Rincian Item) berhasil diexport ke format Excel (.xlsx) rapi (" + reportData.size() + " transaksi).");
-            } catch (IOException e) {
+                PdfReportUtil.exportDetailTransaksi(file, reportData, start, end);
+                showAlert(Alert.AlertType.INFORMATION, "Sukses", "Laporan Penjualan berhasil diexport ke format PDF dengan KOP Surat dan Tanda Tangan rapi (" + reportData.size() + " transaksi).");
+            } catch (Exception e) {
                 showAlert(Alert.AlertType.ERROR, "Error", "Gagal export laporan detail: " + e.getMessage());
                 e.printStackTrace();
             }
@@ -473,7 +460,6 @@ public class LaporanController {
         alert.showAndWait();
     }
 
-    // --- DATA ROW MODELS ---
     public static class LabaRugiRow {
         private final SimpleStringProperty tanggal;
         private final SimpleIntegerProperty jmlTransaksi;

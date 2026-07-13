@@ -54,7 +54,6 @@ public class ProdukDao {
     }
 
     public void delete(String id) throws SQLException {
-        // Check if exists in transaction details
         if (isUsedInTransaction(id)) {
             throw new SQLException("Produk tidak bisa dihapus karena sudah ada dalam data transaksi.");
         }

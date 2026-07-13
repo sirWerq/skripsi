@@ -34,18 +34,15 @@ public class AnalisisController {
     }
 
     private void setupTables() {
-        // Itemsets Table
         colItems.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getItemsetsString()));
         colSupport.setCellValueFactory(new PropertyValueFactory<>("support"));
         
-        // Rules Table
         colAntecedents.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getAntecedentsString()));
         colConsequents.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getConsequentsString()));
         colRuleSupport.setCellValueFactory(new PropertyValueFactory<>("support"));
         colConfidence.setCellValueFactory(new PropertyValueFactory<>("confidence"));
         colLift.setCellValueFactory(new PropertyValueFactory<>("lift"));
         
-        // Format columns to 3 decimal places
         formatDoubleColumn(colSupport);
         formatDoubleColumn(colRuleSupport);
         formatDoubleColumn(colConfidence);
