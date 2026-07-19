@@ -50,6 +50,12 @@ public class TransaksiDetailController {
         colSubtotal.setCellValueFactory(cellData -> 
             new SimpleStringProperty(CurrencyUtil.format(cellData.getValue().getSubtotal())));
         colSubtotal.getStyleClass().add("currency-column");
+
+        if (tableItems != null) {
+            for (TableColumn<?, ?> col : tableItems.getColumns()) {
+                col.setSortable(false);
+            }
+        }
     }
 
     public void setData(Transaksi t) {

@@ -49,6 +49,11 @@ public class ProdukController {
         colHargaJual.getStyleClass().add("currency-column");
         
         setupActionColumn();
+        if (tableProduk != null) {
+            for (TableColumn<?, ?> col : tableProduk.getColumns()) {
+                col.setSortable(false);
+            }
+        }
         loadData();
         
         pagination.currentPageIndexProperty().addListener((obs, oldIdx, newIdx) -> updatePage(newIdx.intValue()));

@@ -4,7 +4,6 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Text?>
 <?import javafx.geometry.Insets?>
-<?import org.kordamp.ikonli.javafx.FontIcon?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.chart.LineChart?>
@@ -17,12 +16,11 @@
         <padding>
             <Insets top="30" />
         </padding>
-        
         <VBox alignment="CENTER" spacing="10">
             <padding>
                 <Insets bottom="30" left="20" right="20" />
             </padding>
-            <ImageView fitWidth="80.0" fitHeight="80.0" preserveRatio="true">
+            <ImageView fitWidth="100.0" fitHeight="100.0" preserveRatio="true">
                 <image>
                     <Image url="@../images/logo.png"/>
                 </image>
@@ -30,27 +28,15 @@
             <Text style="-fx-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;" text="Warung Haryati" />
         </VBox>
 
-        <Button fx:id="btnDashboard" onAction="#showDashboard" maxWidth="Infinity" styleClass="sidebar-button, sidebar-button-active" text="Dashboard">
-            <graphic><FontIcon iconLiteral="fas-home" iconSize="16" iconColor="#adb5bd"/></graphic>
-        </Button>
-        <Button fx:id="btnProduk" onAction="#showProduk" maxWidth="Infinity" styleClass="sidebar-button" text="Data Produk">
-            <graphic><FontIcon iconLiteral="fas-box" iconSize="16" iconColor="#adb5bd"/></graphic>
-        </Button>
-        <Button fx:id="btnTransaksi" onAction="#showTransaksi" maxWidth="Infinity" styleClass="sidebar-button" text="Data Transaksi">
-            <graphic><FontIcon iconLiteral="fas-shopping-cart" iconSize="16" iconColor="#adb5bd"/></graphic>
-        </Button>
-        <Button fx:id="btnAnalisis" onAction="#showAnalisis" maxWidth="Infinity" styleClass="sidebar-button" text="Analisis FP-Growth">
-            <graphic><FontIcon iconLiteral="fas-brain" iconSize="16" iconColor="#adb5bd"/></graphic>
-        </Button>
-        <Button fx:id="btnLaporan" onAction="#showLaporan" maxWidth="Infinity" styleClass="sidebar-button" text="Laporan">
-            <graphic><FontIcon iconLiteral="fas-file-alt" iconSize="16" iconColor="#adb5bd"/></graphic>
-        </Button>
+        <Button fx:id="btnDashboard" onAction="#showDashboard" maxWidth="Infinity" styleClass="sidebar-button, sidebar-button-active" text="Dashboard" />
+        <Button fx:id="btnProduk" onAction="#showProduk" maxWidth="Infinity" styleClass="sidebar-button" text="Kelola Data Produk" />
+        <Button fx:id="btnTransaksi" onAction="#showTransaksi" maxWidth="Infinity" styleClass="sidebar-button" text="Kelola Data Transaksi" />
+        <Button fx:id="btnAnalisis" onAction="#showAnalisis" maxWidth="Infinity" styleClass="sidebar-button" text="Analisis FP-Growth" />
+        <Button fx:id="btnLaporan" onAction="#showLaporan" maxWidth="Infinity" styleClass="sidebar-button" text="Laporan" />
         
         <Region VBox.vgrow="ALWAYS" />
         
-        <Button onAction="#handleLogout" maxWidth="Infinity" styleClass="sidebar-button" style="-fx-text-fill: #e74c3c;" text="Logout">
-            <graphic><FontIcon iconLiteral="fas-sign-out-alt" iconSize="16" iconColor="#e74c3c"/></graphic>
-        </Button>
+        <Button onAction="#handleLogout" maxWidth="Infinity" styleClass="sidebar-button" style="-fx-text-fill: #e74c3c;" text="Logout" />
     </VBox>
     
     <StackPane fx:id="contentArea" HBox.hgrow="ALWAYS" style="-fx-background-color: #f8f9fa;">
@@ -60,11 +46,9 @@
         
         <VBox fx:id="dashboardView" spacing="30">
             <HBox alignment="CENTER_LEFT">
-                <Text style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-fill: #2c3e50;" text="Dashboard Overview" />
+                <Text style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-fill: #2c3e50;" text="Dashboard" />
                 <Region HBox.hgrow="ALWAYS" />
-                <Button onAction="#handleImport" styleClass="button-primary" style="-fx-background-color: #2ecc71;" text="Import Dataset">
-                    <graphic><FontIcon iconLiteral="fas-file-import" iconColor="white"/></graphic>
-                </Button>
+                <Button onAction="#handleImport" styleClass="button-primary" style="-fx-background-color: #2ecc71;" text="Import Dataset" />
             </HBox>
             
             <GridPane hgap="25" vgap="0">
@@ -75,7 +59,6 @@
                 
                 <VBox spacing="10" styleClass="card" GridPane.columnIndex="0">
                     <HBox alignment="CENTER_LEFT" spacing="15">
-                        <FontIcon iconLiteral="fas-receipt" iconSize="30" iconColor="#3498db"/>
                         <VBox>
                             <Text style="-fx-fill: #95a5a6; -fx-font-size: 14px;" text="Total Transaksi" />
                             <Text fx:id="txtTotalTransaksi" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="0" />
@@ -85,7 +68,6 @@
                 
                 <VBox spacing="10" styleClass="card" GridPane.columnIndex="1">
                     <HBox alignment="CENTER_LEFT" spacing="15">
-                        <FontIcon iconLiteral="fas-boxes" iconSize="30" iconColor="#2ecc71"/>
                         <VBox>
                             <Text style="-fx-fill: #95a5a6; -fx-font-size: 14px;" text="Total Produk" />
                             <Text fx:id="txtTotalProduk" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="0" />

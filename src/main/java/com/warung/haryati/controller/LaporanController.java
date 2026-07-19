@@ -46,6 +46,11 @@ public class LaporanController {
     @FXML private TableColumn<LaporanRow, String> colTanggal, colId, colItems, colTotal;
     private ObservableList<LaporanRow> reportData = FXCollections.observableArrayList();
 
+    @FXML private TableView<DataProdukRow> tableDataProduk;
+    @FXML private TableColumn<DataProdukRow, String> colProdukNo, colProdukId, colProdukNama, colProdukHargaBeli, colProdukHargaJual;
+    @FXML private Text txtTotalProduk;
+    private ObservableList<DataProdukRow> dataProdukList = FXCollections.observableArrayList();
+
     @FXML
     public void initialize() {
         setupDatePickers();
@@ -120,6 +125,20 @@ public class LaporanController {
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colItems.setCellValueFactory(new PropertyValueFactory<>("items"));
         colTotal.setCellValueFactory(new PropertyValueFactory<>("totalStr"));
+
+        colProdukNo.setCellValueFactory(new PropertyValueFactory<>("noStr"));
+        colProdukId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        colProdukNama.setCellValueFactory(new PropertyValueFactory<>("namaBarang"));
+        colProdukHargaBeli.setCellValueFactory(new PropertyValueFactory<>("hargaBeliStr"));
+        colProdukHargaJual.setCellValueFactory(new PropertyValueFactory<>("hargaJualStr"));
+
+        for (TableView<?> table : new TableView<?>[]{tableLabaRugi, tableBarangTerlaris, tableDataProduk, tableFpGrowthReport, tableLaporan}) {
+            if (table != null) {
+                for (TableColumn<?, ?> col : table.getColumns()) {
+                    col.setSortable(false);
+                }
+            }
+        }
     }
 
     @FXML
@@ -172,6 +191,7 @@ public class LaporanController {
         loadLabaRugi();
         loadBarangTerlaris();
         loadDetailTransaksi();
+        loadDataProduk();
         checkAndLoadExistingFpGrowthResult();
     }
 
@@ -452,6 +472,61 @@ public class LaporanController {
         }
     }
 
+    private void loadDataProduk() {
+        dataProdukList.clear();
+        int totalProduk = 0;
+
+        String sql = "SELECT id, nama_barang, harga_beli, harga_jual FROM produk ORDER BY nama_barang ASC";
+
+        try (Connection conn = DBConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
+            int no = 1;
+            while (rs.next()) {
+                String id = rs.getString("id");
+                String nama = rs.getString("nama_barang");
+                double beli = rs.getDouble("harga_beli");
+                double jual = rs.getDouble("harga_jual");
+
+                dataProdukList.add(new DataProdukRow(no++, id, nama, beli, jual));
+                
+                totalProduk++;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Error", "Gagal memuat Laporan Data Produk: " + e.getMessage());
+        }
+
+        tableDataProduk.setItems(dataProdukList);
+        tableDataProduk.refresh();
+        txtTotalProduk.setText(totalProduk + " Item");
+    }
+
+    @FXML
+    private void handleExportDataProduk() {
+        if (dataProdukList.isEmpty()) {
+            showAlert(Alert.AlertType.WARNING, "Peringatan", "Tidak ada data produk untuk diexport.");
+            return;
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Simpan Laporan Data Produk (PDF)");
+        fileChooser.setInitialFileName("Laporan_Data_Produk_" + LocalDate.now() + ".pdf");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF Files (*.pdf)", "*.pdf"));
+        
+        File file = fileChooser.showSaveDialog(null);
+        if (file != null) {
+            try {
+                PdfReportUtil.exportDataProduk(file, dataProdukList);
+                showAlert(Alert.AlertType.INFORMATION, "Sukses", "Laporan Data Produk berhasil diexport ke format PDF dengan KOP Surat dan Tanda Tangan rapi (" + dataProdukList.size() + " produk).");
+            } catch (Exception e) {
+                showAlert(Alert.AlertType.ERROR, "Error", "Gagal export Laporan Data Produk: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+
     private void showAlert(Alert.AlertType type, String title, String content) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
@@ -582,5 +657,36 @@ public class LaporanController {
         public String getItems() { return items.get(); }
         public double getTotal() { return total.get(); }
         public String getTotalStr() { return totalStr.get(); }
+    }
+
+    public static class DataProdukRow {
+        private final SimpleIntegerProperty no;
+        private final SimpleStringProperty noStr;
+        private final SimpleStringProperty id;
+        private final SimpleStringProperty namaBarang;
+        private final SimpleDoubleProperty hargaBeli;
+        private final SimpleStringProperty hargaBeliStr;
+        private final SimpleDoubleProperty hargaJual;
+        private final SimpleStringProperty hargaJualStr;
+
+        public DataProdukRow(int no, String id, String namaBarang, double hargaBeli, double hargaJual) {
+            this.no = new SimpleIntegerProperty(no);
+            this.noStr = new SimpleStringProperty(String.valueOf(no));
+            this.id = new SimpleStringProperty(id);
+            this.namaBarang = new SimpleStringProperty(namaBarang);
+            this.hargaBeli = new SimpleDoubleProperty(hargaBeli);
+            this.hargaBeliStr = new SimpleStringProperty(CurrencyUtil.format(hargaBeli));
+            this.hargaJual = new SimpleDoubleProperty(hargaJual);
+            this.hargaJualStr = new SimpleStringProperty(CurrencyUtil.format(hargaJual));
+        }
+
+        public int getNo() { return no.get(); }
+        public String getNoStr() { return noStr.get(); }
+        public String getId() { return id.get(); }
+        public String getNamaBarang() { return namaBarang.get(); }
+        public double getHargaBeli() { return hargaBeli.get(); }
+        public String getHargaBeliStr() { return hargaBeliStr.get(); }
+        public double getHargaJual() { return hargaJual.get(); }
+        public String getHargaJualStr() { return hargaJualStr.get(); }
     }
 }

@@ -4,7 +4,6 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Text?>
 <?import javafx.geometry.Insets?>
-<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <VBox spacing="25" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
       fx:controller="com.warung.haryati.controller.AnalisisController" style="-fx-background-color: transparent;">
@@ -15,7 +14,7 @@
 
     <HBox alignment="CENTER_LEFT">
         <VBox spacing="5">
-            <Text style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-fill: #2c3e50;" text="Analisis Pola Pembelian" />
+            <Text style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-fill: #2c3e50;" text="Analisis FP-Growth" />
             <Text style="-fx-fill: #7f8c8d; -fx-font-size: 14px;" text="Menggunakan Algoritma FP-Growth untuk Market Basket Analysis" />
         </VBox>
         <Region HBox.hgrow="ALWAYS" />
@@ -36,7 +35,6 @@
             </VBox>
             
             <Button onAction="#handleAnalyze" styleClass="button-primary" text="Jalankan Analisis">
-                <graphic><FontIcon iconLiteral="fas-play" iconColor="white"/></graphic>
                 <padding><Insets left="20" right="20" top="10" bottom="10"/></padding>
             </Button>
             
@@ -54,8 +52,8 @@
                             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                         </columnResizePolicy>
                         <columns>
-                            <TableColumn fx:id="colItems" text="Itemsets (Kombinasi Produk)" prefWidth="400" />
-                            <TableColumn fx:id="colSupport" text="Support" prefWidth="150" />
+                            <TableColumn fx:id="colItems" sortable="false" text="Itemsets (Kombinasi Produk)" prefWidth="400" />
+                            <TableColumn fx:id="colSupport" sortable="false" text="Support" prefWidth="150" />
                         </columns>
 
                         <placeholder>
@@ -72,11 +70,11 @@
                             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                         </columnResizePolicy>
                         <columns>
-                            <TableColumn fx:id="colAntecedents" text="Jika Membeli (Antecedents)" prefWidth="250" />
-                            <TableColumn fx:id="colConsequents" text="Maka Membeli (Consequents)" prefWidth="250" />
-                            <TableColumn fx:id="colRuleSupport" text="Support" prefWidth="100" />
-                            <TableColumn fx:id="colConfidence" text="Confidence" prefWidth="100" />
-                            <TableColumn fx:id="colLift" text="Lift" prefWidth="100" />
+                            <TableColumn fx:id="colAntecedents" sortable="false" text="Jika Membeli (Antecedents)" prefWidth="250" />
+                            <TableColumn fx:id="colConsequents" sortable="false" text="Maka Membeli (Consequents)" prefWidth="250" />
+                            <TableColumn fx:id="colRuleSupport" sortable="false" text="Support" prefWidth="100" />
+                            <TableColumn fx:id="colConfidence" sortable="false" text="Confidence" prefWidth="100" />
+                            <TableColumn fx:id="colLift" sortable="false" text="Lift" prefWidth="100" />
                         </columns>
 
                         <placeholder>

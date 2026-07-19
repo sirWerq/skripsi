@@ -117,7 +117,7 @@ public class PdfReportUtil {
         document.open();
 
         addKopSurat(document);
-        addReportTitle(document, "LAPORAN ANALISIS POLA PEMBELIAN (ALGORITMA FP-GROWTH)", start, end);
+        addReportTitle(document, "LAPORAN ANALISIS FP-GROWTH", start, end);
 
         PdfPTable table = new PdfPTable(new float[]{0.8f, 2.5f, 2.5f, 1.2f, 1.2f, 1f, 3.8f});
         table.setWidthPercentage(100);
@@ -186,6 +186,43 @@ public class PdfReportUtil {
         document.close();
     }
 
+    public static void exportDataProduk(File file, List<DataProdukRow> data) throws IOException, DocumentException {
+        Document document = new Document(PageSize.A4, 36, 36, 36, 36);
+        PdfWriter.getInstance(document, new FileOutputStream(file));
+        document.open();
+
+        addKopSurat(document);
+        addReportTitle(document, "LAPORAN DATA MASTER PRODUK", null, null);
+
+        PdfPTable table = new PdfPTable(new float[]{1f, 2f, 5.5f, 2.75f, 2.75f});
+        table.setWidthPercentage(100);
+
+        addHeaderCell(table, "No");
+        addHeaderCell(table, "ID Produk");
+        addHeaderCell(table, "Nama Barang");
+        addHeaderCell(table, "Harga Beli");
+        addHeaderCell(table, "Harga Jual");
+
+        for (int i = 0; i < data.size(); i++) {
+            DataProdukRow item = data.get(i);
+            addDataCell(table, String.valueOf(i + 1), Element.ALIGN_CENTER, false, false);
+            addDataCell(table, item.getId(), Element.ALIGN_CENTER, false, false);
+            addDataCell(table, item.getNamaBarang(), Element.ALIGN_LEFT, false, false);
+            addDataCell(table, item.getHargaBeliStr(), Element.ALIGN_RIGHT, false, false);
+            addDataCell(table, item.getHargaJualStr(), Element.ALIGN_RIGHT, false, false);
+        }
+
+        addDataCell(table, "", Element.ALIGN_CENTER, true, true);
+        addDataCell(table, "", Element.ALIGN_CENTER, true, true);
+        addDataCell(table, "TOTAL (" + data.size() + " Item)", Element.ALIGN_LEFT, true, true);
+        addDataCell(table, "", Element.ALIGN_RIGHT, true, true);
+        addDataCell(table, "", Element.ALIGN_RIGHT, true, true);
+
+        document.add(table);
+        addSignatureBlock(document);
+        document.close();
+    }
+
     private static void addKopSurat(Document document) throws DocumentException, IOException {
         PdfPTable kopTable = new PdfPTable(new float[]{1.5f, 6.5f});
         kopTable.setWidthPercentage(100);
@@ -239,10 +276,10 @@ public class PdfReportUtil {
         kopTable.addCell(textCell);
 
         document.add(kopTable);
-
-        document.add(new Paragraph(" "));
-        LineSeparator ls = new LineSeparator(2f, 100f, BaseColor.BLACK, Element.ALIGN_CENTER, -5f);
+        
+        LineSeparator ls = new LineSeparator(2.5f, 100f, BaseColor.BLACK, Element.ALIGN_CENTER, -5f);
         document.add(new Chunk(ls));
+        
         document.add(new Paragraph(" "));
     }
 

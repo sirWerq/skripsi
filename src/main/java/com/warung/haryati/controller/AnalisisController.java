@@ -47,6 +47,14 @@ public class AnalisisController {
         formatDoubleColumn(colRuleSupport);
         formatDoubleColumn(colConfidence);
         formatDoubleColumn(colLift);
+
+        for (TableView<?> table : new TableView<?>[]{tableItemsets, tableRules}) {
+            if (table != null) {
+                for (TableColumn<?, ?> col : table.getColumns()) {
+                    col.setSortable(false);
+                }
+            }
+        }
     }
 
     private <S> void formatDoubleColumn(TableColumn<S, Double> column) {

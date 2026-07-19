@@ -29,10 +29,10 @@
 
     <TableView fx:id="tableItems" VBox.vgrow="ALWAYS">
         <columns>
-            <TableColumn fx:id="colProduk" prefWidth="250" text="Nama Barang" />
-            <TableColumn fx:id="colHarga" prefWidth="120" text="Harga Satuan" />
-            <TableColumn fx:id="colQty" prefWidth="70" text="Qty" />
-            <TableColumn fx:id="colSubtotal" prefWidth="120" text="Subtotal" />
+            <TableColumn fx:id="colProduk" prefWidth="250" sortable="false" text="Nama Barang" />
+            <TableColumn fx:id="colHarga" prefWidth="120" sortable="false" text="Harga Satuan" />
+            <TableColumn fx:id="colQty" prefWidth="70" sortable="false" text="Qty" />
+            <TableColumn fx:id="colSubtotal" prefWidth="120" sortable="false" text="Subtotal" />
         </columns>
     </TableView>
 

@@ -48,6 +48,11 @@ public class TransaksiController {
         colTotal.getStyleClass().add("currency-column");
         
         setupActionColumn();
+        if (tableTransaksi != null) {
+            for (TableColumn<?, ?> col : tableTransaksi.getColumns()) {
+                col.setSortable(false);
+            }
+        }
         loadData();
 
         pagination.currentPageIndexProperty().addListener((obs, oldIdx, newIdx) -> updatePage(newIdx.intValue()));

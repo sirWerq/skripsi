@@ -32,9 +32,9 @@
 
         <TableView fx:id="tableItems" prefHeight="200">
             <columns>
-                <TableColumn fx:id="colProduk" prefWidth="200" text="Produk" />
-                <TableColumn fx:id="colQty" prefWidth="70" text="Qty" />
-                <TableColumn fx:id="colSubtotal" prefWidth="120" text="Subtotal" />
+                <TableColumn fx:id="colProduk" prefWidth="200" sortable="false" text="Produk" />
+                <TableColumn fx:id="colQty" prefWidth="70" sortable="false" text="Qty" />
+                <TableColumn fx:id="colSubtotal" prefWidth="120" sortable="false" text="Subtotal" />
             </columns>
         </TableView>
     </VBox>

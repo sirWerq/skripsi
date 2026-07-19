@@ -82,6 +82,12 @@ public class TransaksiFormController {
             new SimpleStringProperty(CurrencyUtil.format(cellData.getValue().getSubtotal())));
         colSubtotal.getStyleClass().add("currency-column");
         
+        if (tableItems != null) {
+            for (TableColumn<?, ?> col : tableItems.getColumns()) {
+                col.setSortable(false);
+            }
+        }
+        
         tableItems.setItems(items);
     }
 

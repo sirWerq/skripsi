@@ -129,8 +129,8 @@ Cari file `src/main/java/com/warung/haryati/App.java`, klik kanan pada file ters
 ## Cara Pakai Aplikasi
 1. **Login**: Setelah aplikasi terbuka, masukkan Username: `admin` dan Password: `admin123`.
 2. **Dashboard**: Menampilkan ringkasan total penjualan, total laba, jumlah produk, dan jumlah transaksi.
-3. **Data Produk**: Masuk ke menu "Produk" untuk menambah, mengedit, atau menghapus daftar barang warung.
-4. **Transaksi**: Masuk ke menu "Transaksi" untuk mencatat penjualan baru. Masukkan produk dan jumlah, lalu sistem otomatis menghitung subtotal.
+3. **Kelola Data Produk**: Masuk ke menu "Kelola Data Produk" untuk menambah, mengedit, atau menghapus daftar barang warung.
+4. **Kelola Data Transaksi**: Masuk ke menu "Kelola Data Transaksi" untuk mencatat penjualan baru. Masukkan produk dan jumlah, lalu sistem otomatis menghitung subtotal.
 5. **Laporan & Analisis Bisnis (4 Laporan Utama)**:
    - Masuk ke menu "Laporan" untuk mengakses 4 tab laporan eksekutif warung:
      - **Laba Rugi & Omset**: Menampilkan rincian transaksi, omset kotor, modal (HPP), dan laba bersih warung per hari.
