@@ -47,6 +47,25 @@ public class TransaksiDao {
         }
     }
 
+    public void insert(Transaksi t) throws SQLException {
+        Connection conn = DBConnection.getConnection();
+        String sql = "INSERT INTO transaksi (id, tanggal) VALUES (?, ?)";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, t.getId());
+            pstmt.setDate(2, t.getTanggal());
+            pstmt.executeUpdate();
+        }
+    }
+
+    public void update(Transaksi t) throws SQLException {
+        String sql = "UPDATE transaksi SET tanggal = ? WHERE id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setDate(1, t.getTanggal());
+            pstmt.setString(2, t.getId());
+            pstmt.executeUpdate();
+        }
+    }
 
     public List<Transaksi> getAll() throws SQLException {
         List<Transaksi> list = new ArrayList<>();

@@ -86,20 +86,11 @@ public class TransaksiController {
 
     private void setupActionColumn() {
         colAksi.setCellFactory(param -> new TableCell<>() {
-            private final Button btnDetail = new Button();
             private final Button btnEdit = new Button();
             private final Button btnDelete = new Button();
-            private final HBox pane = new HBox(5, btnDetail, btnEdit, btnDelete);
+            private final HBox pane = new HBox(5, btnEdit, btnDelete);
 
             {
-                btnDetail.setGraphic(new FontIcon("fas-info-circle"));
-                btnDetail.getStyleClass().add("button-primary");
-                btnDetail.setStyle("-fx-background-color: #17a2b8;");
-                btnDetail.setOnAction(event -> {
-                    Transaksi t = getTableView().getItems().get(getIndex());
-                    showDetail(t);
-                });
-
                 btnEdit.setGraphic(new FontIcon("fas-edit"));
                 btnEdit.getStyleClass().add("button-primary");
                 btnEdit.setStyle("-fx-background-color: #f39c12;");
@@ -141,23 +132,6 @@ public class TransaksiController {
             if (controller.isSaved()) {
                 loadData();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void showDetail(Transaksi t) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/transaksi_detail.fxml"));
-            Stage stage = new Stage();
-            stage.setTitle("Detail Transaksi #" + t.getId());
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setScene(new Scene(loader.load()));
-            
-            TransaksiDetailController controller = loader.getController();
-            controller.setData(t);
-            
-            stage.show();
         } catch (IOException e) {
             e.printStackTrace();
         }

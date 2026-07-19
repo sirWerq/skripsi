@@ -31,6 +31,7 @@
         <Button fx:id="btnDashboard" onAction="#showDashboard" maxWidth="Infinity" styleClass="sidebar-button, sidebar-button-active" text="Dashboard" />
         <Button fx:id="btnProduk" onAction="#showProduk" maxWidth="Infinity" styleClass="sidebar-button" text="Kelola Data Produk" />
         <Button fx:id="btnTransaksi" onAction="#showTransaksi" maxWidth="Infinity" styleClass="sidebar-button" text="Kelola Data Transaksi" />
+        <Button fx:id="btnDetailTransaksi" onAction="#showDetailTransaksi" maxWidth="Infinity" styleClass="sidebar-button" text="Kelola Detail Transaksi" />
         <Button fx:id="btnAnalisis" onAction="#showAnalisis" maxWidth="Infinity" styleClass="sidebar-button" text="Analisis FP-Growth" />
         <Button fx:id="btnLaporan" onAction="#showLaporan" maxWidth="Infinity" styleClass="sidebar-button" text="Laporan" />
         

@@ -30,7 +30,7 @@ public class DashboardController {
     @FXML private Text txtTotalProduk;
     @FXML private LineChart<String, Number> salesChart;
     
-    @FXML private Button btnDashboard, btnProduk, btnTransaksi, btnAnalisis, btnLaporan;
+    @FXML private Button btnDashboard, btnProduk, btnTransaksi, btnDetailTransaksi, btnAnalisis, btnLaporan;
 
     private CSVService csvService = new CSVService();
 
@@ -130,6 +130,11 @@ public class DashboardController {
         setActive(btnTransaksi); 
         loadView("transaksi");
     }
+
+    @FXML private void showDetailTransaksi() { 
+        setActive(btnDetailTransaksi); 
+        loadView("detail_transaksi");
+    }
     
     @FXML 
     private void showAnalisis() { 
@@ -155,6 +160,7 @@ public class DashboardController {
         btnDashboard.getStyleClass().remove("sidebar-button-active");
         btnProduk.getStyleClass().remove("sidebar-button-active");
         btnTransaksi.getStyleClass().remove("sidebar-button-active");
+        btnDetailTransaksi.getStyleClass().remove("sidebar-button-active");
         btnAnalisis.getStyleClass().remove("sidebar-button-active");
         btnLaporan.getStyleClass().remove("sidebar-button-active");
         

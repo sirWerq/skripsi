@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Text?>
+
+<VBox spacing="15" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.warung.haryati.controller.DetailTransaksiFormController" style="-fx-background-color: white;">
+    <padding>
+        <Insets top="20" left="25" right="25" bottom="20" />
+    </padding>
+
+    <Text style="-fx-font-size: 20px; -fx-font-weight: bold;" text="Form Detail Transaksi" />
+
+    <GridPane vgap="15" hgap="15">
+        <columnConstraints>
+            <ColumnConstraints minWidth="100" />
+            <ColumnConstraints hgrow="ALWAYS" minWidth="200" />
+        </columnConstraints>
+
+        <Label text="ID Transaksi:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+        <ComboBox fx:id="cbTransaksi" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+        <Label text="Produk:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+        <ComboBox fx:id="cbProduk" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+        <Label text="Kuantitas:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+        <Spinner fx:id="spinKuantitas" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="2">
+            <valueFactory>
+                <SpinnerValueFactory.IntegerSpinnerValueFactory min="1" max="1000" initialValue="1" />
+            </valueFactory>
+        </Spinner>
+    </GridPane>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <padding>
+            <Insets top="10" />
+        </padding>
+        <Button text="Batal" onAction="#handleBatal" styleClass="button-secondary" />
+        <Button text="Simpan" onAction="#handleSimpan" styleClass="button-primary" />
+    </HBox>
+</VBox>

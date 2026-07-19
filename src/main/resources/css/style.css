@@ -8,7 +8,7 @@
 
 /* Sidebar Modernization */
 .sidebar {
-    -fx-background-color: #1e1e2d;
+    -fx-background-color: #151F2D;
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 5, 0);
 }
 
@@ -25,14 +25,14 @@
 }
 
 .sidebar-button:hover {
-    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-background-color: #273161;
     -fx-text-fill: white;
 }
 
 .sidebar-button-active {
-    -fx-background-color: rgba(67, 97, 238, 0.1);
-    -fx-border-color: #4361ee;
-    -fx-text-fill: #4361ee;
+    -fx-background-color: #273161;
+    -fx-border-color: transparent;
+    -fx-text-fill: white;
     -fx-font-weight: bold;
 }
 
