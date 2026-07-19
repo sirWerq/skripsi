@@ -194,7 +194,7 @@ public class PdfReportUtil {
         addKopSurat(document);
         addReportTitle(document, "LAPORAN DATA MASTER PRODUK", null, null);
 
-        PdfPTable table = new PdfPTable(new float[]{1f, 2f, 5.5f, 2.75f, 2.75f});
+        PdfPTable table = new PdfPTable(new float[]{1f, 2f, 4.5f, 2.75f, 2.75f, 1f});
         table.setWidthPercentage(100);
 
         addHeaderCell(table, "No");
@@ -202,6 +202,7 @@ public class PdfReportUtil {
         addHeaderCell(table, "Nama Barang");
         addHeaderCell(table, "Harga Beli");
         addHeaderCell(table, "Harga Jual");
+        addHeaderCell(table, "Stok");
 
         for (int i = 0; i < data.size(); i++) {
             DataProdukRow item = data.get(i);
@@ -210,6 +211,7 @@ public class PdfReportUtil {
             addDataCell(table, item.getNamaBarang(), Element.ALIGN_LEFT, false, false);
             addDataCell(table, item.getHargaBeliStr(), Element.ALIGN_RIGHT, false, false);
             addDataCell(table, item.getHargaJualStr(), Element.ALIGN_RIGHT, false, false);
+            addDataCell(table, item.getStokStr(), Element.ALIGN_CENTER, false, false);
         }
 
         addDataCell(table, "", Element.ALIGN_CENTER, true, true);
@@ -217,6 +219,7 @@ public class PdfReportUtil {
         addDataCell(table, "TOTAL (" + data.size() + " Item)", Element.ALIGN_LEFT, true, true);
         addDataCell(table, "", Element.ALIGN_RIGHT, true, true);
         addDataCell(table, "", Element.ALIGN_RIGHT, true, true);
+        addDataCell(table, "", Element.ALIGN_CENTER, true, true);
 
         document.add(table);
         addSignatureBlock(document);

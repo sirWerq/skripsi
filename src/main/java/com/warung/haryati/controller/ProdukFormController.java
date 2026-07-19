@@ -14,6 +14,7 @@ public class ProdukFormController {
     @FXML private TextField namaField;
     @FXML private TextField hargaBeliField;
     @FXML private TextField hargaJualField;
+    @FXML private TextField stokField;
 
     private ProdukDao produkDao = new ProdukDao();
     private boolean saved = false;
@@ -24,6 +25,7 @@ public class ProdukFormController {
         namaField.setText(p.getNamaBarang());
         hargaBeliField.setText(String.valueOf(p.getHargaBeli()));
         hargaJualField.setText(String.valueOf(p.getHargaJual()));
+        stokField.setText(String.valueOf(p.getStok()));
     }
 
     public boolean isSaved() { return saved; }
@@ -33,8 +35,9 @@ public class ProdukFormController {
         String nama = namaField.getText().trim();
         String hargaBeliStr = hargaBeliField.getText().trim();
         String hargaJualStr = hargaJualField.getText().trim();
+        String stokStr = stokField.getText().trim();
 
-        if (nama.isEmpty() || hargaBeliStr.isEmpty() || hargaJualStr.isEmpty()) {
+        if (nama.isEmpty() || hargaBeliStr.isEmpty() || hargaJualStr.isEmpty() || stokStr.isEmpty()) {
             showAlert("Error", "Semua field harus diisi!");
             return;
         }
@@ -42,9 +45,10 @@ public class ProdukFormController {
         try {
             double hargaBeli = Double.parseDouble(hargaBeliStr);
             double hargaJual = Double.parseDouble(hargaJualStr);
+            int stok = Integer.parseInt(stokStr);
 
-            if (hargaBeli < 0 || hargaJual < 0) {
-                showAlert("Error", "Harga tidak boleh negatif!");
+            if (hargaBeli < 0 || hargaJual < 0 || stok < 0) {
+                showAlert("Error", "Harga dan stok tidak boleh negatif!");
                 return;
             }
 
@@ -57,17 +61,19 @@ public class ProdukFormController {
                 p.setNamaBarang(nama);
                 p.setHargaBeli(hargaBeli);
                 p.setHargaJual(hargaJual);
+                p.setStok(stok);
                 produkDao.insert(p);
             } else {
                 currentProduk.setNamaBarang(nama);
                 currentProduk.setHargaBeli(hargaBeli);
                 currentProduk.setHargaJual(hargaJual);
+                currentProduk.setStok(stok);
                 produkDao.update(currentProduk);
             }
             saved = true;
             closeStage();
         } catch (NumberFormatException e) {
-            showAlert("Error", "Harga harus berupa angka yang valid!");
+            showAlert("Error", "Harga dan Stok harus berupa angka yang valid!");
         } catch (SQLException e) {
             showAlert("Database Error", "Gagal menyimpan data: " + e.getMessage());
         }

@@ -106,10 +106,32 @@ public class DetailTransaksiFormController {
         }
 
         int qty = spinKuantitas.getValue();
-        double subtotal = qty * selectedProduk.getHargaJual();
-        double laba = subtotal - (qty * selectedProduk.getHargaBeli());
 
         try {
+            if (currentData == null) {
+                // New Item
+                if (qty > selectedProduk.getStok()) {
+                    showAlert(Alert.AlertType.ERROR, "Stok Tidak Cukup", "Stok produk hanya tersisa " + selectedProduk.getStok());
+                    return;
+                }
+            } else {
+                // Edit Item
+                if (currentData.getProdukId().equals(selectedProduk.getId())) {
+                    int delta = qty - currentData.getKuantitas();
+                    if (delta > selectedProduk.getStok()) {
+                        showAlert(Alert.AlertType.ERROR, "Stok Tidak Cukup", "Stok produk hanya tersisa " + selectedProduk.getStok());
+                        return;
+                    }
+                } else {
+                    if (qty > selectedProduk.getStok()) {
+                        showAlert(Alert.AlertType.ERROR, "Stok Tidak Cukup", "Stok produk baru hanya tersisa " + selectedProduk.getStok());
+                        return;
+                    }
+                }
+            }
+
+            double subtotal = qty * selectedProduk.getHargaJual();
+            double laba = subtotal - (qty * selectedProduk.getHargaBeli());
             if (currentData == null) {
                 currentData = new DetailTransaksi();
                 currentData.setTransaksiId(selectedTrx.getId());
@@ -118,7 +140,16 @@ public class DetailTransaksiFormController {
                 currentData.setSubtotal(subtotal);
                 currentData.setLaba(laba);
                 detailTransaksiDao.insert(currentData);
+                produkDao.updateStok(selectedProduk.getId(), -qty);
             } else {
+                if (!currentData.getProdukId().equals(selectedProduk.getId())) {
+                    produkDao.updateStok(currentData.getProdukId(), currentData.getKuantitas());
+                    produkDao.updateStok(selectedProduk.getId(), -qty);
+                } else {
+                    int delta = qty - currentData.getKuantitas();
+                    produkDao.updateStok(selectedProduk.getId(), -delta);
+                }
+                
                 currentData.setTransaksiId(selectedTrx.getId());
                 currentData.setProdukId(selectedProduk.getId());
                 currentData.setKuantitas(qty);

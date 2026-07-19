@@ -47,7 +47,7 @@ public class LaporanController {
     private ObservableList<LaporanRow> reportData = FXCollections.observableArrayList();
 
     @FXML private TableView<DataProdukRow> tableDataProduk;
-    @FXML private TableColumn<DataProdukRow, String> colProdukNo, colProdukId, colProdukNama, colProdukHargaBeli, colProdukHargaJual;
+    @FXML private TableColumn<DataProdukRow, String> colProdukNo, colProdukId, colProdukNama, colProdukHargaBeli, colProdukHargaJual, colProdukStok;
     @FXML private Text txtTotalProduk;
     private ObservableList<DataProdukRow> dataProdukList = FXCollections.observableArrayList();
 
@@ -131,6 +131,7 @@ public class LaporanController {
         colProdukNama.setCellValueFactory(new PropertyValueFactory<>("namaBarang"));
         colProdukHargaBeli.setCellValueFactory(new PropertyValueFactory<>("hargaBeliStr"));
         colProdukHargaJual.setCellValueFactory(new PropertyValueFactory<>("hargaJualStr"));
+        colProdukStok.setCellValueFactory(new PropertyValueFactory<>("stokStr"));
 
         for (TableView<?> table : new TableView<?>[]{tableLabaRugi, tableBarangTerlaris, tableDataProduk, tableFpGrowthReport, tableLaporan}) {
             if (table != null) {
@@ -476,7 +477,7 @@ public class LaporanController {
         dataProdukList.clear();
         int totalProduk = 0;
 
-        String sql = "SELECT id, nama_barang, harga_beli, harga_jual FROM produk ORDER BY nama_barang ASC";
+        String sql = "SELECT id, nama_barang, harga_beli, harga_jual, stok FROM produk ORDER BY nama_barang ASC";
 
         try (Connection conn = DBConnection.getConnection();
              Statement stmt = conn.createStatement();
@@ -488,8 +489,9 @@ public class LaporanController {
                 String nama = rs.getString("nama_barang");
                 double beli = rs.getDouble("harga_beli");
                 double jual = rs.getDouble("harga_jual");
+                int stok = rs.getInt("stok");
 
-                dataProdukList.add(new DataProdukRow(no++, id, nama, beli, jual));
+                dataProdukList.add(new DataProdukRow(no++, id, nama, beli, jual, stok));
                 
                 totalProduk++;
             }
@@ -668,8 +670,10 @@ public class LaporanController {
         private final SimpleStringProperty hargaBeliStr;
         private final SimpleDoubleProperty hargaJual;
         private final SimpleStringProperty hargaJualStr;
+        private final SimpleIntegerProperty stok;
+        private final SimpleStringProperty stokStr;
 
-        public DataProdukRow(int no, String id, String namaBarang, double hargaBeli, double hargaJual) {
+        public DataProdukRow(int no, String id, String namaBarang, double hargaBeli, double hargaJual, int stok) {
             this.no = new SimpleIntegerProperty(no);
             this.noStr = new SimpleStringProperty(String.valueOf(no));
             this.id = new SimpleStringProperty(id);
@@ -678,6 +682,8 @@ public class LaporanController {
             this.hargaBeliStr = new SimpleStringProperty(CurrencyUtil.format(hargaBeli));
             this.hargaJual = new SimpleDoubleProperty(hargaJual);
             this.hargaJualStr = new SimpleStringProperty(CurrencyUtil.format(hargaJual));
+            this.stok = new SimpleIntegerProperty(stok);
+            this.stokStr = new SimpleStringProperty(String.valueOf(stok));
         }
 
         public int getNo() { return no.get(); }
@@ -688,5 +694,7 @@ public class LaporanController {
         public String getHargaBeliStr() { return hargaBeliStr.get(); }
         public double getHargaJual() { return hargaJual.get(); }
         public String getHargaJualStr() { return hargaJualStr.get(); }
+        public int getStok() { return stok.get(); }
+        public String getStokStr() { return stokStr.get(); }
     }
 }

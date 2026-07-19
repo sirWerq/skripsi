@@ -128,8 +128,9 @@
                         <TableColumn fx:id="colProdukNo" prefWidth="60" sortable="false" text="No" />
                         <TableColumn fx:id="colProdukId" prefWidth="100" sortable="false" text="ID Produk" />
                         <TableColumn fx:id="colProdukNama" prefWidth="250" sortable="false" text="Nama Barang" />
-                        <TableColumn fx:id="colProdukHargaBeli" prefWidth="140" sortable="false" text="Harga Beli (Modal)" />
-                        <TableColumn fx:id="colProdukHargaJual" prefWidth="140" sortable="false" text="Harga Jual" />
+                        <TableColumn fx:id="colProdukHargaBeli" prefWidth="120" sortable="false" text="Harga Beli (Modal)" />
+                        <TableColumn fx:id="colProdukHargaJual" prefWidth="120" sortable="false" text="Harga Jual" />
+                        <TableColumn fx:id="colProdukStok" prefWidth="80" sortable="false" text="Stok" />
                     </columns>
                 </TableView>
             </VBox>

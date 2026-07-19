@@ -113,6 +113,13 @@ public class TransaksiDao {
     }
 
     public void delete(String tId) throws SQLException {
+        // Return stock before deleting details
+        List<DetailTransaksi> details = getDetailsByTransaksiId(tId);
+        ProdukDao produkDao = new ProdukDao();
+        for (DetailTransaksi d : details) {
+            produkDao.updateStok(d.getProdukId(), d.getKuantitas());
+        }
+
         Connection conn = DBConnection.getConnection();
         try {
             conn.setAutoCommit(false);

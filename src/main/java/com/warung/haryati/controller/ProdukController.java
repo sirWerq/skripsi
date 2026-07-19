@@ -28,6 +28,7 @@ public class ProdukController {
     @FXML private TableColumn<Produk, String> colNama;
     @FXML private TableColumn<Produk, String> colHargaBeli;
     @FXML private TableColumn<Produk, String> colHargaJual;
+    @FXML private TableColumn<Produk, Integer> colStok;
     @FXML private TableColumn<Produk, Void> colAksi;
     @FXML private Pagination pagination;
 
@@ -47,6 +48,8 @@ public class ProdukController {
         colHargaJual.setCellValueFactory(cellData -> 
             new SimpleStringProperty(CurrencyUtil.format(cellData.getValue().getHargaJual())));
         colHargaJual.getStyleClass().add("currency-column");
+        
+        colStok.setCellValueFactory(new PropertyValueFactory<>("stok"));
         
         setupActionColumn();
         if (tableProduk != null) {

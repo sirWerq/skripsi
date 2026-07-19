@@ -25,6 +25,7 @@
                 <TableColumn fx:id="colNama" prefWidth="250" sortable="false" text="Nama Barang" />
                 <TableColumn fx:id="colHargaBeli" prefWidth="120" sortable="false" text="Harga Beli" />
                 <TableColumn fx:id="colHargaJual" prefWidth="120" sortable="false" text="Harga Jual" />
+                <TableColumn fx:id="colStok" prefWidth="80" sortable="false" text="Stok" />
                 <TableColumn fx:id="colAksi" prefWidth="150" sortable="false" text="Aksi" />
             </columns>
         </TableView>

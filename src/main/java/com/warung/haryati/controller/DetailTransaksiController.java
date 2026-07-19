@@ -171,6 +171,7 @@ public class DetailTransaksiController {
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
+                produkDao.updateStok(t.getProdukId(), t.getKuantitas());
                 detailTransaksiDao.delete(t.getId());
                 loadData();
             } catch (SQLException e) {
