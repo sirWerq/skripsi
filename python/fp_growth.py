@@ -6,15 +6,14 @@ import warnings
 warnings.filterwarnings("ignore")
 os.environ['PYTHONWARNINGS'] = 'ignore'
 
-# pyrefly: ignore [missing-import]
-import mysql.connector
+import pymysql
 import pandas as pd
 from mlxtend.preprocessing import TransactionEncoder
 from mlxtend.frequent_patterns import fpgrowth, association_rules
 
 def get_data_from_db():
     try:
-        conn = mysql.connector.connect(
+        conn = pymysql.connect(
             host="localhost",
             user="root",
             password="",
