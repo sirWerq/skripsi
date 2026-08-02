@@ -3,23 +3,23 @@ package com.warung.haryati.model;
 import java.sql.Date;
 
 public class Transaksi {
-    private String id;
+    private String transaksiId;
     private Date tanggal;
-    private double total;
+    private double totalBelanja;
 
     public Transaksi() {}
 
-    public Transaksi(String id, Date tanggal) {
-        this.id = id;
+    public Transaksi(String transaksiId, Date tanggal) {
+        this.transaksiId = transaksiId;
         this.tanggal = tanggal;
     }
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public String getTransaksiId() { return transaksiId; }
+    public void setTransaksiId(String transaksiId) { this.transaksiId = transaksiId; }
 
     public Date getTanggal() { return tanggal; }
     public void setTanggal(Date tanggal) { this.tanggal = tanggal; }
 
-    public double getTotal() { return total; }
-    public void setTotal(double total) { this.total = total; }
+    public double getTotalBelanja() { return totalBelanja; }
+    public void setTotalBelanja(double totalBelanja) { this.totalBelanja = totalBelanja; }
 }

@@ -24,7 +24,7 @@ public class TransaksiFormController {
 
     public void setTransaksi(Transaksi t) {
         this.currentTransaksi = t;
-        this.idField.setText(t.getId());
+        this.idField.setText(t.getTransaksiId());
         this.idField.setDisable(true);
         this.tanggalPicker.setValue(t.getTanggal().toLocalDate());
     }
@@ -68,7 +68,7 @@ public class TransaksiFormController {
         try {
             if (currentTransaksi == null) {
                 Transaksi t = new Transaksi();
-                t.setId(idField.getText().trim());
+                t.setTransaksiId(idField.getText().trim());
                 t.setTanggal(Date.valueOf(tanggalPicker.getValue()));
                 transaksiDao.insert(t);
             } else {

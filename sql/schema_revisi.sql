@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS dashboard (
 CREATE TABLE IF NOT EXISTS produk (
     id_produk VARCHAR(50) PRIMARY KEY,
     nama_barang VARCHAR(100) NOT NULL,
+    stok INT NOT NULL DEFAULT 0,
     harga_beli DOUBLE NOT NULL,
     harga_jual DOUBLE NOT NULL
 );
@@ -52,6 +53,7 @@ CREATE TABLE IF NOT EXISTS detail_transaksi (
     produk_id VARCHAR(50) NOT NULL,
     kuantitas INT NOT NULL,
     subtotal DOUBLE NOT NULL,
+    laba DOUBLE NOT NULL,
     FOREIGN KEY (transaksi_id) REFERENCES transaksi(transaksi_id),
     FOREIGN KEY (produk_id) REFERENCES produk(id_produk)
 );

@@ -182,6 +182,14 @@
     -fx-background-color: #f8f9fa;
 }
 
+.table-view .table-row-cell:selected {
+    -fx-background-color: #4361ee;
+}
+
+.table-view .table-row-cell:selected .table-cell {
+    -fx-text-fill: white;
+}
+
 /* Chart Styles */
 .chart-series-line {
     -fx-stroke: #4361ee;

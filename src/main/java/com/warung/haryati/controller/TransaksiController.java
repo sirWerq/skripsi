@@ -36,7 +36,7 @@ public class TransaksiController {
 
     @FXML
     public void initialize() {
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        colId.setCellValueFactory(new PropertyValueFactory<>("transaksiId"));
         colId.getStyleClass().add("center-column");
 
         colTanggal.setCellValueFactory(cellData -> 
@@ -44,7 +44,7 @@ public class TransaksiController {
         colTanggal.getStyleClass().add("center-column");
 
         colTotal.setCellValueFactory(cellData -> 
-            new SimpleStringProperty(CurrencyUtil.format(cellData.getValue().getTotal())));
+            new javafx.beans.property.SimpleStringProperty(CurrencyUtil.format(cellData.getValue().getTotalBelanja())));
         colTotal.getStyleClass().add("currency-column");
         
         setupActionColumn();
@@ -62,7 +62,7 @@ public class TransaksiController {
         try {
             List<Transaksi> list = transaksiDao.getAll();
             for (Transaksi t : list) {
-                t.setTotal(transaksiDao.getTotalByTransaksiId(t.getId()));
+                t.setTotalBelanja(transaksiDao.getTotalByTransaksiId(t.getTransaksiId()));
             }
             allTransaksi.setAll(list);
             
@@ -121,7 +121,7 @@ public class TransaksiController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/transaksi_form.fxml"));
             Stage stage = new Stage();
-            stage.setTitle("Edit Transaksi #" + t.getId());
+            stage.setTitle("Edit Transaksi #" + t.getTransaksiId());
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(new Scene(loader.load()));
             
@@ -141,12 +141,12 @@ public class TransaksiController {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Hapus Transaksi");
         alert.setHeaderText(null);
-        alert.setContentText("Apakah Anda yakin ingin menghapus transaksi #" + t.getId() + "?");
+        alert.setContentText("Apakah Anda yakin ingin menghapus transaksi #" + t.getTransaksiId() + "?");
         
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
-                transaksiDao.delete(t.getId());
+                transaksiDao.delete(t.getTransaksiId());
                 loadData();
             } catch (SQLException e) {
                 e.printStackTrace();

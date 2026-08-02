@@ -1,7 +1,7 @@
 package com.warung.haryati.model;
 
 public class DetailTransaksi {
-    private String id;
+    private String detailId;
     private String transaksiId;
     private String produkId;
     private int kuantitas;
@@ -10,8 +10,8 @@ public class DetailTransaksi {
 
     public DetailTransaksi() {}
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public String getDetailId() { return detailId; }
+    public void setDetailId(String detailId) { this.detailId = detailId; }
 
     public String getTransaksiId() { return transaksiId; }
     public void setTransaksiId(String transaksiId) { this.transaksiId = transaksiId; }

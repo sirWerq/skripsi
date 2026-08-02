@@ -25,7 +25,8 @@ CREATE TABLE IF NOT EXISTS produk (
 -- Tabel Transaksi
 CREATE TABLE IF NOT EXISTS transaksi (
     id VARCHAR(50) PRIMARY KEY,
-    tanggal DATE NOT NULL
+    tanggal DATE NOT NULL,
+    total DOUBLE NOT NULL
 );
 
 -- Tabel Detail Transaksi

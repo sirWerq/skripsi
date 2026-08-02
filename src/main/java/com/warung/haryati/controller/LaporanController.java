@@ -207,13 +207,13 @@ public class LaporanController {
         LocalDate end = dpEnd.getValue();
         if (start == null || end == null) return;
 
-        String sql = "SELECT DATE(t.tanggal) as tanggal, COUNT(DISTINCT t.id) as jml_transaksi, " +
+        String sql = "SELECT DATE(t.tanggal) as tanggal, COUNT(DISTINCT t.transaksi_id) as jml_transaksi, " +
                      "SUM(dt.subtotal) as omset, " +
                      "SUM(dt.kuantitas * p.harga_beli) as modal, " +
                      "SUM(dt.laba) as laba_bersih " +
                      "FROM transaksi t " +
-                     "JOIN detail_transaksi dt ON t.id = dt.transaksi_id " +
-                     "JOIN produk p ON dt.produk_id = p.id " +
+                     "JOIN detail_transaksi dt ON t.transaksi_id = dt.transaksi_id " +
+                     "JOIN produk p ON dt.produk_id = p.id_produk " +
                      "WHERE DATE(t.tanggal) BETWEEN ? AND ? " +
                      "GROUP BY DATE(t.tanggal) ORDER BY tanggal DESC";
 
@@ -252,6 +252,7 @@ public class LaporanController {
 
     @FXML
     private void handleExportLabaRugi() {
+        logLaporanExport("Laba Rugi & Omset");
         commitDatePickers();
         if (labaRugiData.isEmpty()) {
             showAlert(Alert.AlertType.WARNING, "Peringatan", "Tidak ada data Laba Rugi untuk diexport.");
@@ -287,10 +288,10 @@ public class LaporanController {
         String sql = "SELECT p.nama_barang, SUM(dt.kuantitas) as total_terjual, " +
                      "SUM(dt.subtotal) as total_pendapatan, SUM(dt.laba) as total_laba " +
                      "FROM detail_transaksi dt " +
-                     "JOIN produk p ON dt.produk_id = p.id " +
-                     "JOIN transaksi t ON dt.transaksi_id = t.id " +
+                     "JOIN produk p ON dt.produk_id = p.id_produk " +
+                     "JOIN transaksi t ON dt.transaksi_id = t.transaksi_id " +
                      "WHERE DATE(t.tanggal) BETWEEN ? AND ? " +
-                     "GROUP BY p.id, p.nama_barang " +
+                     "GROUP BY p.id_produk, p.nama_barang " +
                      "ORDER BY total_terjual DESC";
 
         try (Connection conn = DBConnection.getConnection();
@@ -321,6 +322,7 @@ public class LaporanController {
 
     @FXML
     private void handleExportBarangTerlaris() {
+        logLaporanExport("Barang Terlaris");
         commitDatePickers();
         if (barangTerlarisData.isEmpty()) {
             showAlert(Alert.AlertType.WARNING, "Peringatan", "Tidak ada data Barang Terlaris untuk diexport.");
@@ -377,6 +379,7 @@ public class LaporanController {
 
     @FXML
     private void handleExportFpGrowth() {
+        logLaporanExport("Analisis FP-Growth");
         if (fpGrowthReportData.isEmpty()) {
             showAlert(Alert.AlertType.WARNING, "Peringatan", "Tidak ada data Analisis FP-Growth untuk diexport. Silakan jalankan analisis terlebih dahulu.");
             return;
@@ -408,13 +411,13 @@ public class LaporanController {
         LocalDate end = dpEnd.getValue();
         if (start == null || end == null) return;
 
-        String sql = "SELECT t.id, t.tanggal, SUM(dt.subtotal) as total_amount, " +
+        String sql = "SELECT t.transaksi_id, t.tanggal, SUM(dt.subtotal) as total_amount, " +
                      "GROUP_CONCAT(CONCAT(p.nama_barang, ' (', dt.kuantitas, ')') SEPARATOR ', ') as items " +
                      "FROM transaksi t " +
-                     "JOIN detail_transaksi dt ON t.id = dt.transaksi_id " +
-                     "JOIN produk p ON dt.produk_id = p.id " +
+                     "JOIN detail_transaksi dt ON t.transaksi_id = dt.transaksi_id " +
+                     "JOIN produk p ON dt.produk_id = p.id_produk " +
                      "WHERE DATE(t.tanggal) BETWEEN ? AND ? " +
-                     "GROUP BY t.id ORDER BY t.tanggal DESC";
+                     "GROUP BY t.transaksi_id ORDER BY t.tanggal DESC";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -427,7 +430,7 @@ public class LaporanController {
                 double total = rs.getDouble("total_amount");
                 reportData.add(new LaporanRow(
                     com.warung.haryati.util.DateUtil.formatShort(rs.getDate("tanggal")),
-                    rs.getString("id"),
+                    rs.getString("transaksi_id"),
                     rs.getString("items"),
                     total
                 ));
@@ -447,6 +450,7 @@ public class LaporanController {
 
     @FXML
     private void handleExport() {
+        logLaporanExport("Riwayat Transaksi");
         commitDatePickers();
         if (reportData.isEmpty()) {
             showAlert(Alert.AlertType.WARNING, "Peringatan", "Tidak ada data transaksi untuk diexport.");
@@ -477,7 +481,7 @@ public class LaporanController {
         dataProdukList.clear();
         int totalProduk = 0;
 
-        String sql = "SELECT id, nama_barang, harga_beli, harga_jual, stok FROM produk ORDER BY nama_barang ASC";
+        String sql = "SELECT id_produk, nama_barang, harga_beli, harga_jual, stok FROM produk ORDER BY nama_barang ASC";
 
         try (Connection conn = DBConnection.getConnection();
              Statement stmt = conn.createStatement();
@@ -485,7 +489,7 @@ public class LaporanController {
             
             int no = 1;
             while (rs.next()) {
-                String id = rs.getString("id");
+                String id = rs.getString("id_produk");
                 String nama = rs.getString("nama_barang");
                 double beli = rs.getDouble("harga_beli");
                 double jual = rs.getDouble("harga_jual");
@@ -507,6 +511,7 @@ public class LaporanController {
 
     @FXML
     private void handleExportDataProduk() {
+        logLaporanExport("Data Produk");
         if (dataProdukList.isEmpty()) {
             showAlert(Alert.AlertType.WARNING, "Peringatan", "Tidak ada data produk untuk diexport.");
             return;
@@ -526,6 +531,28 @@ public class LaporanController {
                 showAlert(Alert.AlertType.ERROR, "Error", "Gagal export Laporan Data Produk: " + e.getMessage());
                 e.printStackTrace();
             }
+        }
+    }
+
+    private void logLaporanExport(String jenisLaporan) {
+        String idLaporan = "LPR-" + java.util.UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        try (Connection conn = DBConnection.getConnection()) {
+            String sql = "INSERT INTO laporan (id_laporan, jenis_laporan, periode_awal, periode_akhir, tanggal_cetak) VALUES (?, ?, ?, ?, ?)";
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, idLaporan);
+                stmt.setString(2, jenisLaporan);
+                
+                // Get local dates from date pickers or fallback
+                LocalDate start = dpStart != null && dpStart.getValue() != null ? dpStart.getValue() : LocalDate.now();
+                LocalDate end = dpEnd != null && dpEnd.getValue() != null ? dpEnd.getValue() : LocalDate.now();
+                
+                stmt.setDate(3, java.sql.Date.valueOf(start));
+                stmt.setDate(4, java.sql.Date.valueOf(end));
+                stmt.setTimestamp(5, new java.sql.Timestamp(System.currentTimeMillis()));
+                stmt.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 

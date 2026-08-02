@@ -1,7 +1,7 @@
 package com.warung.haryati.model;
 
 public class Produk {
-    private String id;
+    private String idProduk;
     private String namaBarang;
     private double hargaBeli;
     private double hargaJual;
@@ -9,16 +9,16 @@ public class Produk {
 
     public Produk() {}
 
-    public Produk(String id, String namaBarang, double hargaBeli, double hargaJual, int stok) {
-        this.id = id;
+    public Produk(String idProduk, String namaBarang, double hargaBeli, double hargaJual, int stok) {
+        this.idProduk = idProduk;
         this.namaBarang = namaBarang;
         this.hargaBeli = hargaBeli;
         this.hargaJual = hargaJual;
         this.stok = stok;
     }
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public String getIdProduk() { return idProduk; }
+    public void setIdProduk(String idProduk) { this.idProduk = idProduk; }
 
     public String getNamaBarang() { return namaBarang; }
     public void setNamaBarang(String namaBarang) { this.namaBarang = namaBarang; }

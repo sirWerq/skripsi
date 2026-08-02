@@ -16,20 +16,21 @@ public class TransaksiDao {
         try {
             conn.setAutoCommit(false);
 
-            if (t.getId() == null) t.setId(IDGenerator.generate("TRX"));
+            if (t.getTransaksiId() == null) t.setTransaksiId(IDGenerator.generate("TRX"));
 
-            String sqlT = "INSERT INTO transaksi (id, tanggal) VALUES (?, ?)";
+            String sqlT = "INSERT INTO transaksi (transaksi_id, tanggal, total_belanja) VALUES (?, ?, ?)";
             PreparedStatement pstmtT = conn.prepareStatement(sqlT);
-            pstmtT.setString(1, t.getId());
+            pstmtT.setString(1, t.getTransaksiId());
             pstmtT.setDate(2, t.getTanggal());
+            pstmtT.setDouble(3, t.getTotalBelanja());
             pstmtT.executeUpdate();
 
-            String sqlD = "INSERT INTO detail_transaksi (id, transaksi_id, produk_id, kuantitas, subtotal, laba) VALUES (?, ?, ?, ?, ?, ?)";
+            String sqlD = "INSERT INTO detail_transaksi (detail_id, transaksi_id, produk_id, kuantitas, subtotal, laba) VALUES (?, ?, ?, ?, ?, ?)";
             PreparedStatement pstmtD = conn.prepareStatement(sqlD);
             for (DetailTransaksi d : details) {
-                if (d.getId() == null) d.setId(IDGenerator.generate("DT"));
-                pstmtD.setString(1, d.getId());
-                pstmtD.setString(2, t.getId());
+                if (d.getDetailId() == null) d.setDetailId(IDGenerator.generate("DT"));
+                pstmtD.setString(1, d.getDetailId());
+                pstmtD.setString(2, t.getTransaksiId());
                 pstmtD.setString(3, d.getProdukId());
                 pstmtD.setInt(4, d.getKuantitas());
                 pstmtD.setDouble(5, d.getSubtotal());
@@ -49,20 +50,22 @@ public class TransaksiDao {
 
     public void insert(Transaksi t) throws SQLException {
         Connection conn = DBConnection.getConnection();
-        String sql = "INSERT INTO transaksi (id, tanggal) VALUES (?, ?)";
+        String sql = "INSERT INTO transaksi (transaksi_id, tanggal, total_belanja) VALUES (?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, t.getId());
+            pstmt.setString(1, t.getTransaksiId());
             pstmt.setDate(2, t.getTanggal());
+            pstmt.setDouble(3, t.getTotalBelanja());
             pstmt.executeUpdate();
         }
     }
 
     public void update(Transaksi t) throws SQLException {
-        String sql = "UPDATE transaksi SET tanggal = ? WHERE id = ?";
+        String sql = "UPDATE transaksi SET tanggal = ?, total_belanja = ? WHERE transaksi_id = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setDate(1, t.getTanggal());
-            pstmt.setString(2, t.getId());
+            pstmt.setDouble(2, t.getTotalBelanja());
+            pstmt.setString(3, t.getTransaksiId());
             pstmt.executeUpdate();
         }
     }
@@ -74,7 +77,9 @@ public class TransaksiDao {
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                list.add(new Transaksi(rs.getString("id"), rs.getDate("tanggal")));
+                Transaksi tx = new Transaksi(rs.getString("transaksi_id"), rs.getDate("tanggal"));
+                tx.setTotalBelanja(rs.getDouble("total_belanja"));
+                list.add(tx);
             }
         }
         return list;
@@ -89,7 +94,7 @@ public class TransaksiDao {
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 DetailTransaksi d = new DetailTransaksi();
-                d.setId(rs.getString("id"));
+                d.setDetailId(rs.getString("detail_id"));
                 d.setTransaksiId(rs.getString("transaksi_id"));
                 d.setProdukId(rs.getString("produk_id"));
                 d.setKuantitas(rs.getInt("kuantitas"));
@@ -129,7 +134,7 @@ public class TransaksiDao {
             pstmtD.setString(1, tId);
             pstmtD.executeUpdate();
             
-            String sqlT = "DELETE FROM transaksi WHERE id = ?";
+            String sqlT = "DELETE FROM transaksi WHERE transaksi_id = ?";
             PreparedStatement pstmtT = conn.prepareStatement(sqlT);
             pstmtT.setString(1, tId);
             pstmtT.executeUpdate();
@@ -149,21 +154,22 @@ public class TransaksiDao {
             
             String sqlD = "DELETE FROM detail_transaksi WHERE transaksi_id = ?";
             PreparedStatement pstmtD = conn.prepareStatement(sqlD);
-            pstmtD.setString(1, t.getId());
+            pstmtD.setString(1, t.getTransaksiId());
             pstmtD.executeUpdate();
             
-            String sqlT = "UPDATE transaksi SET tanggal = ? WHERE id = ?";
+            String sqlT = "UPDATE transaksi SET tanggal = ?, total_belanja = ? WHERE transaksi_id = ?";
             PreparedStatement pstmtT = conn.prepareStatement(sqlT);
             pstmtT.setDate(1, t.getTanggal());
-            pstmtT.setString(2, t.getId());
+            pstmtT.setDouble(2, t.getTotalBelanja());
+            pstmtT.setString(3, t.getTransaksiId());
             pstmtT.executeUpdate();
             
-            String sqlDI = "INSERT INTO detail_transaksi (id, transaksi_id, produk_id, kuantitas, subtotal, laba) VALUES (?, ?, ?, ?, ?, ?)";
+            String sqlDI = "INSERT INTO detail_transaksi (detail_id, transaksi_id, produk_id, kuantitas, subtotal, laba) VALUES (?, ?, ?, ?, ?, ?)";
             PreparedStatement pstmtDI = conn.prepareStatement(sqlDI);
             for (DetailTransaksi d : details) {
-                if (d.getId() == null) d.setId(IDGenerator.generate("DT"));
-                pstmtDI.setString(1, d.getId());
-                pstmtDI.setString(2, t.getId());
+                if (d.getDetailId() == null) d.setDetailId(IDGenerator.generate("DT"));
+                pstmtDI.setString(1, d.getDetailId());
+                pstmtDI.setString(2, t.getTransaksiId());
                 pstmtDI.setString(3, d.getProdukId());
                 pstmtDI.setInt(4, d.getKuantitas());
                 pstmtDI.setDouble(5, d.getSubtotal());

@@ -41,7 +41,7 @@ public class DetailTransaksiFormController {
         cbTransaksi.setConverter(new StringConverter<>() {
             @Override
             public String toString(Transaksi t) {
-                return t == null ? "" : t.getId() + " - " + com.warung.haryati.util.DateUtil.formatShort(t.getTanggal());
+                return t == null ? "" : t.getTransaksiId() + " - " + com.warung.haryati.util.DateUtil.formatShort(t.getTanggal());
             }
 
             @Override
@@ -79,14 +79,14 @@ public class DetailTransaksiFormController {
         this.currentData = t;
         
         for (Transaksi trx : cbTransaksi.getItems()) {
-            if (trx.getId().equals(t.getTransaksiId())) {
+            if (trx.getTransaksiId().equals(t.getTransaksiId())) {
                 cbTransaksi.setValue(trx);
                 break;
             }
         }
         
         for (Produk p : cbProduk.getItems()) {
-            if (p.getId().equals(t.getProdukId())) {
+            if (p.getIdProduk().equals(t.getProdukId())) {
                 cbProduk.setValue(p);
                 break;
             }
@@ -116,7 +116,7 @@ public class DetailTransaksiFormController {
                 }
             } else {
                 // Edit Item
-                if (currentData.getProdukId().equals(selectedProduk.getId())) {
+                if (currentData.getProdukId().equals(selectedProduk.getIdProduk())) {
                     int delta = qty - currentData.getKuantitas();
                     if (delta > selectedProduk.getStok()) {
                         showAlert(Alert.AlertType.ERROR, "Stok Tidak Cukup", "Stok produk hanya tersisa " + selectedProduk.getStok());
@@ -134,24 +134,24 @@ public class DetailTransaksiFormController {
             double laba = subtotal - (qty * selectedProduk.getHargaBeli());
             if (currentData == null) {
                 currentData = new DetailTransaksi();
-                currentData.setTransaksiId(selectedTrx.getId());
-                currentData.setProdukId(selectedProduk.getId());
+                currentData.setTransaksiId(selectedTrx.getTransaksiId());
+                currentData.setProdukId(selectedProduk.getIdProduk());
                 currentData.setKuantitas(qty);
                 currentData.setSubtotal(subtotal);
                 currentData.setLaba(laba);
                 detailTransaksiDao.insert(currentData);
-                produkDao.updateStok(selectedProduk.getId(), -qty);
+                produkDao.updateStok(selectedProduk.getIdProduk(), -qty);
             } else {
-                if (!currentData.getProdukId().equals(selectedProduk.getId())) {
+                if (!currentData.getProdukId().equals(selectedProduk.getIdProduk())) {
                     produkDao.updateStok(currentData.getProdukId(), currentData.getKuantitas());
-                    produkDao.updateStok(selectedProduk.getId(), -qty);
+                    produkDao.updateStok(selectedProduk.getIdProduk(), -qty);
                 } else {
                     int delta = qty - currentData.getKuantitas();
-                    produkDao.updateStok(selectedProduk.getId(), -delta);
+                    produkDao.updateStok(selectedProduk.getIdProduk(), -delta);
                 }
                 
-                currentData.setTransaksiId(selectedTrx.getId());
-                currentData.setProdukId(selectedProduk.getId());
+                currentData.setTransaksiId(selectedTrx.getTransaksiId());
+                currentData.setProdukId(selectedProduk.getIdProduk());
                 currentData.setKuantitas(qty);
                 currentData.setSubtotal(subtotal);
                 currentData.setLaba(laba);

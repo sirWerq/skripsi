@@ -82,7 +82,7 @@ public class LoginController {
         }
 
         try (Connection conn = DBConnection.getConnection()) {
-            String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
+            String sql = "SELECT * FROM pemilik_warung_haryati WHERE nama_pemilik = ? AND kata_sandi = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, username);
             pstmt.setString(2, password);
@@ -90,6 +90,17 @@ public class LoginController {
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
+                String idPemilik = rs.getString("id_pemilik");
+                com.warung.haryati.util.UserSession.setIdPemilik(idPemilik);
+                
+                String idLogin = "LGN-" + java.util.UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+                String insertLogin = "INSERT INTO login (id_login, id_pemilik) VALUES (?, ?)";
+                try (PreparedStatement insertStmt = conn.prepareStatement(insertLogin)) {
+                    insertStmt.setString(1, idLogin);
+                    insertStmt.setString(2, idPemilik);
+                    insertStmt.executeUpdate();
+                }
+                
                 App.setRoot("dashboard");
             } else {
                 errorLabel.setText("Username atau Password salah");

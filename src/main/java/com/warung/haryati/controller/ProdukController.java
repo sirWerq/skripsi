@@ -38,7 +38,7 @@ public class ProdukController {
 
     @FXML
     public void initialize() {
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        colId.setCellValueFactory(new PropertyValueFactory<>("idProduk"));
         colNama.setCellValueFactory(new PropertyValueFactory<>("namaBarang"));
         
         colHargaBeli.setCellValueFactory(cellData -> 
@@ -152,7 +152,7 @@ public class ProdukController {
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
-                produkDao.delete(p.getId());
+                produkDao.delete(p.getIdProduk());
                 loadData();
             } catch (SQLException e) {
                 Alert errorAlert = new Alert(Alert.AlertType.ERROR);

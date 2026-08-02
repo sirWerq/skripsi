@@ -6,9 +6,6 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.chart.LineChart?>
-<?import javafx.scene.chart.CategoryAxis?>
-<?import javafx.scene.chart.NumberAxis?>
 
 <HBox prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
       fx:controller="com.warung.haryati.controller.DashboardController" stylesheets="@../css/style.css" styleClass="root">
@@ -48,8 +45,6 @@
         <VBox fx:id="dashboardView" spacing="30">
             <HBox alignment="CENTER_LEFT">
                 <Text style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-fill: #2c3e50;" text="Dashboard" />
-                <Region HBox.hgrow="ALWAYS" />
-                <Button onAction="#handleImport" styleClass="button-primary" style="-fx-background-color: #2ecc71;" text="Import Dataset" />
             </HBox>
             
             <GridPane hgap="25" vgap="0">
@@ -77,12 +72,8 @@
                 </VBox>
             </GridPane>
             
-            <VBox VBox.vgrow="ALWAYS" styleClass="card" spacing="15">
-                <Text style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Tren Penjualan Per Bulan" />
-                <LineChart fx:id="salesChart" legendSide="BOTTOM" createSymbols="false" style="-fx-background-color: transparent;">
-                    <xAxis><CategoryAxis side="BOTTOM" label="Tanggal" /></xAxis>
-                    <yAxis><NumberAxis side="LEFT" label="Pendapatan (Rp)" /></yAxis>
-                </LineChart>
+            <VBox alignment="CENTER" VBox.vgrow="ALWAYS" styleClass="card" spacing="20">
+                <Button onAction="#handleImport" styleClass="button-primary" style="-fx-background-color: #2ecc71; -fx-font-size: 18px; -fx-padding: 15 40;" text="Import Dataset" />
             </VBox>
         </VBox>
     </StackPane>

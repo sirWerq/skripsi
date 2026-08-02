@@ -46,7 +46,7 @@ public class DetailTransaksiController {
 
     @FXML
     public void initialize() {
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        colId.setCellValueFactory(new PropertyValueFactory<>("detailId"));
         colId.getStyleClass().add("center-column");
         
         colTransaksiId.setCellValueFactory(new PropertyValueFactory<>("transaksiId"));
@@ -85,7 +85,7 @@ public class DetailTransaksiController {
             produkMap.clear();
             List<Produk> produks = produkDao.getAll();
             for (Produk p : produks) {
-                produkMap.put(p.getId(), p.getNamaBarang());
+                produkMap.put(p.getIdProduk(), p.getNamaBarang());
             }
 
             List<DetailTransaksi> list = detailTransaksiDao.getAll();
@@ -146,7 +146,7 @@ public class DetailTransaksiController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/detail_transaksi_form.fxml"));
             Stage stage = new Stage();
-            stage.setTitle("Edit Detail Transaksi #" + t.getId());
+            stage.setTitle("Edit Detail Transaksi #" + t.getDetailId());
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(new Scene(loader.load()));
             
@@ -166,13 +166,13 @@ public class DetailTransaksiController {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Hapus Detail Transaksi");
         alert.setHeaderText(null);
-        alert.setContentText("Apakah Anda yakin ingin menghapus detail transaksi #" + t.getId() + "?");
+        alert.setContentText("Apakah Anda yakin ingin menghapus detail transaksi #" + t.getDetailId() + "?");
         
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
                 produkDao.updateStok(t.getProdukId(), t.getKuantitas());
-                detailTransaksiDao.delete(t.getId());
+                detailTransaksiDao.delete(t.getDetailId());
                 loadData();
             } catch (SQLException e) {
                 e.printStackTrace();

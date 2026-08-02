@@ -12,13 +12,13 @@ public class ProdukDao {
 
     public List<Produk> getAll() throws SQLException {
         List<Produk> list = new ArrayList<>();
-        String sql = "SELECT * FROM produk";
+        String sql = "SELECT * FROM produk ORDER BY id_produk DESC";
         try (Connection conn = DBConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 list.add(new Produk(
-                    rs.getString("id"),
+                    rs.getString("id_produk"),
                     rs.getString("nama_barang"),
                     rs.getDouble("harga_beli"),
                     rs.getDouble("harga_jual"),
@@ -30,11 +30,11 @@ public class ProdukDao {
     }
 
     public void insert(Produk p) throws SQLException {
-        if (p.getId() == null) p.setId(IDGenerator.generate("P"));
-        String sql = "INSERT INTO produk (id, nama_barang, harga_beli, harga_jual, stok) VALUES (?, ?, ?, ?, ?)";
+        if (p.getIdProduk() == null) p.setIdProduk(IDGenerator.generate("P"));
+        String sql = "INSERT INTO produk (id_produk, nama_barang, harga_beli, harga_jual, stok) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, p.getId());
+            pstmt.setString(1, p.getIdProduk());
             pstmt.setString(2, p.getNamaBarang());
             pstmt.setDouble(3, p.getHargaBeli());
             pstmt.setDouble(4, p.getHargaJual());
@@ -44,14 +44,14 @@ public class ProdukDao {
     }
 
     public void update(Produk p) throws SQLException {
-        String sql = "UPDATE produk SET nama_barang=?, harga_beli=?, harga_jual=?, stok=? WHERE id=?";
+        String sql = "UPDATE produk SET nama_barang=?, harga_beli=?, harga_jual=?, stok=? WHERE id_produk=?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, p.getNamaBarang());
             pstmt.setDouble(2, p.getHargaBeli());
             pstmt.setDouble(3, p.getHargaJual());
             pstmt.setInt(4, p.getStok());
-            pstmt.setString(5, p.getId());
+            pstmt.setString(5, p.getIdProduk());
             pstmt.executeUpdate();
         }
     }
@@ -61,7 +61,7 @@ public class ProdukDao {
             throw new SQLException("Produk tidak bisa dihapus karena sudah ada dalam data transaksi.");
         }
 
-        String sql = "DELETE FROM produk WHERE id=?";
+        String sql = "DELETE FROM produk WHERE id_produk=?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, id);
@@ -88,7 +88,7 @@ public class ProdukDao {
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 return new Produk(
-                    rs.getString("id"),
+                    rs.getString("id_produk"),
                     rs.getString("nama_barang"),
                     rs.getDouble("harga_beli"),
                     rs.getDouble("harga_jual"),
@@ -100,7 +100,7 @@ public class ProdukDao {
     }
 
     public void updateStok(String id, int delta) throws SQLException {
-        String sql = "UPDATE produk SET stok = stok + ? WHERE id = ?";
+        String sql = "UPDATE produk SET stok = stok + ? WHERE id_produk = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, delta);

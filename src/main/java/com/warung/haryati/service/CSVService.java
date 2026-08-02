@@ -61,7 +61,7 @@ public class CSVService {
             if (tanggalStr == null || tanggalStr.trim().isEmpty()) continue;
             
             Transaksi t = new Transaksi();
-            t.setId(entry.getKey());
+            t.setTransaksiId(entry.getKey());
             try {
                 String cleanTgl = tanggalStr.trim();
                 if (cleanTgl.contains("/")) {
@@ -90,28 +90,41 @@ public class CSVService {
                 int qty = Integer.parseInt(row.get("Kuantitas"));
                 double subtotal = Double.parseDouble(row.get("Subtotal"));
                 double laba = Double.parseDouble(row.get("Laba"));
+                int stok = 0;
+                if (row.containsKey("Stok") && row.get("Stok") != null && !row.get("Stok").trim().isEmpty()) {
+                    stok = Integer.parseInt(row.get("Stok").trim());
+                }
                 
                 Produk p = produkDao.getByNama(namaBarang);
                 if (p == null) {
                     p = new Produk();
-                    p.setId(IDGenerator.generate("P"));
+                    p.setIdProduk(IDGenerator.generate("P"));
                     p.setNamaBarang(namaBarang);
                     p.setHargaBeli(hBeli);
                     p.setHargaJual(hJual);
+                    p.setStok(stok);
                     produkDao.insert(p);
                 }
                 
                 DetailTransaksi dt = new DetailTransaksi();
-                dt.setId(IDGenerator.generate("DT"));
-                dt.setTransaksiId(t.getId());
-                dt.setProdukId(p.getId());
+                dt.setDetailId(IDGenerator.generate("DT"));
+                dt.setTransaksiId(t.getTransaksiId());
+                dt.setProdukId(p.getIdProduk());
                 dt.setKuantitas(qty);
                 dt.setSubtotal(subtotal);
                 dt.setLaba(laba);
                 details.add(dt);
             }
             
-            transaksiDao.insertWithDetails(t, details);
+            try {
+                transaksiDao.insertWithDetails(t, details);
+            } catch (SQLException e) {
+                if (e.getMessage().contains("Duplicate entry")) {
+                    System.out.println("Melewati transaksi duplikat: " + t.getTransaksiId());
+                } else {
+                    throw e;
+                }
+            }
         }
     }
 }

@@ -8,6 +8,11 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import com.warung.haryati.util.DBConnection;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class AnalisisController {
 
@@ -31,6 +36,40 @@ public class AnalisisController {
     @FXML
     public void initialize() {
         setupTables();
+        loadConfigFromDatabase();
+    }
+
+    private void loadConfigFromDatabase() {
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement("SELECT min_support, min_confidence FROM proses_analisis_fp_growth LIMIT 1");
+             ResultSet rs = pstmt.executeQuery()) {
+            if (rs.next()) {
+                txtMinSupport.setText(String.valueOf(rs.getDouble("min_support")));
+                txtMinConfidence.setText(String.valueOf(rs.getDouble("min_confidence")));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void saveConfigToDatabase(double minSup, double minConf) {
+        String sql = "UPDATE proses_analisis_fp_growth SET min_support = ?, min_confidence = ? WHERE id_analisis = '1'";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setDouble(1, minSup);
+            pstmt.setDouble(2, minConf);
+            int updated = pstmt.executeUpdate();
+            if (updated == 0) {
+                // If id_analisis = '1' doesn't exist, insert it
+                try (PreparedStatement insertStmt = conn.prepareStatement("INSERT INTO proses_analisis_fp_growth (id_analisis, min_support, min_confidence) VALUES ('1', ?, ?)")) {
+                    insertStmt.setDouble(1, minSup);
+                    insertStmt.setDouble(2, minConf);
+                    insertStmt.executeUpdate();
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void setupTables() {
@@ -82,6 +121,8 @@ public class AnalisisController {
                 showAlert("Input Salah", "Nilai support dan confidence harus antara 0.01 sampai 1.0");
                 return;
             }
+            
+            saveConfigToDatabase(minSup, minConf);
 
             System.out.println("Memulai analisis dengan support: " + minSup + ", confidence: " + minConf);
             loadingIndicator.setVisible(true);

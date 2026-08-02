@@ -21,10 +21,10 @@ def get_data_from_db():
             database="db_warung_haryati"
         )
         query = """
-            SELECT t.id as transaction_id, p.nama_barang 
+            SELECT t.transaksi_id as transaction_id, p.nama_barang 
             FROM detail_transaksi dt 
-            JOIN transaksi t ON dt.transaksi_id = t.id 
-            JOIN produk p ON dt.produk_id = p.id
+            JOIN transaksi t ON dt.transaksi_id = t.transaksi_id 
+            JOIN produk p ON dt.produk_id = p.id_produk
         """
         df = pd.read_sql(query, conn)
         conn.close()

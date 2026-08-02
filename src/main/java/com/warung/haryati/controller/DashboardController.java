@@ -6,7 +6,6 @@ import com.warung.haryati.util.DBConnection;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -28,7 +27,6 @@ public class DashboardController {
     @FXML private VBox dashboardView;
     @FXML private Text txtTotalTransaksi;
     @FXML private Text txtTotalProduk;
-    @FXML private LineChart<String, Number> salesChart;
     
     @FXML private Button btnDashboard, btnProduk, btnTransaksi, btnDetailTransaksi, btnAnalisis, btnLaporan;
 
@@ -42,7 +40,6 @@ public class DashboardController {
 
     public void refreshDashboard() {
         loadStatistics();
-        loadChartData();
     }
 
     private void loadStatistics() {
@@ -60,36 +57,6 @@ public class DashboardController {
         }
     }
 
-    private void loadChartData() {
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Pendapatan");
-
-        try (Connection conn = DBConnection.getConnection();
-             Statement stmt = conn.createStatement()) {
-            
-            String sql = "SELECT DATE_FORMAT(t.tanggal, '%Y-%m') as periode, SUM(dt.subtotal) as total " +
-                         "FROM transaksi t JOIN detail_transaksi dt ON t.id = dt.transaksi_id " +
-                         "GROUP BY periode ORDER BY periode ASC LIMIT 12";
-            
-            ResultSet rs = stmt.executeQuery(sql);
-            while (rs.next()) {
-                String periode = rs.getString("periode");
-                try {
-                    java.time.YearMonth ym = java.time.YearMonth.parse(periode);
-                    periode = ym.format(java.time.format.DateTimeFormatter.ofPattern("MMM yyyy", com.warung.haryati.util.DateUtil.LOCALE_ID));
-                } catch (Exception ignored) {}
-                series.getData().add(new XYChart.Data<>(periode, rs.getDouble("total")));
-            }
-
-            
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        salesChart.getData().clear();
-        salesChart.getData().add(series);
-    }
-
     @FXML
     private void handleImport() {
         FileChooser fileChooser = new FileChooser();
@@ -98,8 +65,18 @@ public class DashboardController {
         if (selectedFile != null) {
             try {
                 csvService.importFromCSV(selectedFile);
+                
+                try (Connection conn = DBConnection.getConnection()) {
+                    String sql = "INSERT INTO dashboard (ringkasan_produk, ringkasan_transaksi, file_dataset_excel) VALUES (?, ?, ?)";
+                    try (java.sql.PreparedStatement insertStmt = conn.prepareStatement(sql)) {
+                        insertStmt.setString(1, "Produk: " + txtTotalProduk.getText());
+                        insertStmt.setString(2, "Transaksi: " + txtTotalTransaksi.getText());
+                        insertStmt.setString(3, selectedFile.getName());
+                        insertStmt.executeUpdate();
+                    }
+                }
+                
                 loadStatistics();
-                loadChartData();
                 showAlert(Alert.AlertType.INFORMATION, "Sukses", "Data berhasil diimport!");
             } catch (IOException | SQLException e) {
                 showAlert(Alert.AlertType.ERROR, "Error", "Gagal import: " + e.getMessage());
@@ -170,6 +147,21 @@ public class DashboardController {
     @FXML
     private void handleLogout() {
         try {
+            String idPemilik = com.warung.haryati.util.UserSession.getIdPemilik();
+            if (idPemilik != null) {
+                try (Connection conn = DBConnection.getConnection()) {
+                    String idLogout = "LGO-" + java.util.UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+                    String insertLogout = "INSERT INTO logout (id_logout, id_pemilik) VALUES (?, ?)";
+                    try (java.sql.PreparedStatement insertStmt = conn.prepareStatement(insertLogout)) {
+                        insertStmt.setString(1, idLogout);
+                        insertStmt.setString(2, idPemilik);
+                        insertStmt.executeUpdate();
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                com.warung.haryati.util.UserSession.clear();
+            }
             App.setRoot("login");
         } catch (IOException e) {
             e.printStackTrace();
